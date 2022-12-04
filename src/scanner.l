@@ -6,8 +6,9 @@
 %}
 
 %%
-    /* TODO: ignore {whitespace} */
     /* TODO # comments*/
+
+[ \t]+	/* whitespace */
 
 ";"             { printf("semic\n"); return SEMIC; }
 [^ \t\n;]+      { printf("str\n"); return STR; }

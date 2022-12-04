@@ -1,5 +1,6 @@
 #include "parser.tab.h"
 #include "scanner.h"
+#include <dirent.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,24 +49,32 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
 
 void processLine(char* line)
 {
-    printf("processing line: %s\n", line);
+    printf("dbg: processing line: %s\n", line);
 
-    // char* line = "cd";
-
-    // YY_BUFFER_STATE buf = yy_scan_string(line);
-    // if (yyparse() != 0)
-    // {
-    //     exit(1); //error already printed in parser
-    // }
-    // yy_delete_buffer(buf);
-
+    YY_BUFFER_STATE buf = yy_scan_string(line);
+    if (yyparse() != 0)
+    {
+        exit(1); //error already printed in parser
+    }
+    yy_delete_buffer(buf);
 }
 
 void processInteractive()
 {
+    // set prompt
+    char* cwd = getenv("PWD"); 
+    if (cwd == NULL) {
+        err(1, "PWD not set.\n");
+    }
+    char prompt[MAXNAMLEN] = "";
+    strcat(prompt, "[MY_SHELL]");
+    strcat(prompt, cwd);
+    strcat(prompt, ": ");
+
+    // process input
     char* line;
     while(1) {
-        line = readline("Enter command: ");
+        line = readline(prompt);
 
         processLine(line);
 
