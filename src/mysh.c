@@ -98,7 +98,7 @@ void processScript(char** argv, int argvIdx)
     // {
     //     processLine(line);
     // }
-    //TODO----------------------------------------------------------probably cant use getline()
+    //TODO----------------------------------------------------------probably cant use getline()--------------------------------
 
     close(fd);
 }

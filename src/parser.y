@@ -1,3 +1,5 @@
+%define api.value.type {char*}
+
 %{
     #include <stdio.h>
     int yylex();
@@ -5,7 +7,9 @@
 %}
 
 %token  SEMIC   ";"
-%token  STR     "string without whitespace"
+%token  STR     //"string without whitespace"
+
+// %type<char*> name args
 
 %%
 
@@ -20,7 +24,13 @@ command_list:
     ;
 
 command:
-    name args
+    name args   {
+        printf("name: %s args: %s\n", $1, $2);
+        
+        //free strduped strings
+        free($1);
+        free($2);
+        }
     ;
 
 name:
@@ -29,7 +39,11 @@ name:
 
 args:
     %empty
-    | args STR
+    | args STR  {
+                    //TODO: strcat + free
+                    printf("new arg: %s\n", $2);
+                    $$ = $2;
+                }
     ;
 
 semic_opt:
