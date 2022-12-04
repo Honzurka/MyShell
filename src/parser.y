@@ -5,8 +5,7 @@
 %}
 
 %token  SEMIC   ";"
-%token  ARGS    "program arguments"
-%token  NAME    "program name"
+%token  STR     "string without whitespace"
 
 %%
 
@@ -16,11 +15,21 @@ commands:
 
 command_list:
     %empty
+    | command
     | command_list SEMIC command
     ;
 
 command:
-    NAME ARGS
+    name args
+    ;
+
+name:
+    STR
+    ;
+
+args:
+    %empty
+    | args STR
     ;
 
 semic_opt:

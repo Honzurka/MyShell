@@ -2,15 +2,16 @@
 
 %{
     #include "parser.tab.h"
-    #include <stdio.h> //debug print
+    #include <stdio.h>
 %}
 
 %%
     /* TODO: ignore {whitespace} */
     /* TODO # comments*/
 
-";" { printf("semic\n"); return SEMIC; }
+";"             { printf("semic\n"); return SEMIC; }
+[^ \t\n;]+      { printf("str\n"); return STR; }
 
-    /* . { printf("default: %c\n", yytext); } */
+.   { fprintf(stderr, "unknown char: %s\n", yytext); }
 
 %%

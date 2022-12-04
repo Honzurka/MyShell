@@ -15,8 +15,7 @@ $(EXEC): $(OBJECTS)
 	$(CC) $(OBJECTS) $(CFLAGS) -o $(EXEC)
 
 clean:
-	rm lex.yy.c scanner.h parser.tab.c parser.tab.h
-	rm $(OBJECTS)
+	rm -f lex.yy.c scanner.h parser.tab.c parser.tab.h $(OBJECTS)
 
 # objects
 mysh.o: mysh.c

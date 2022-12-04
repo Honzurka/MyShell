@@ -1,0 +1,5 @@
+lex.yy.*
+parser.tab.*
+scanner.h
+*.o
+mysh
