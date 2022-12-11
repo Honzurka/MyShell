@@ -30,7 +30,7 @@
     - `cd dir`
 - **DONE**`-c option`: execute cmd and exit
 - support for `cmd #comment`
-- non-interactive mode: `mysh test.sh`
+- **SEMI_DONE** non-interactive mode: `mysh test.sh`
     - exit on first error
         - prints lineNum + errormsg
 - retval == retval of last command

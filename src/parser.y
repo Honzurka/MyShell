@@ -3,6 +3,7 @@
 %{
     #include <stdio.h> //dbg
     #include "parserFunctions.h"
+    #include "globalError.h"
 
     int yylex();
     void yyerror(char *s);
@@ -58,5 +59,5 @@ semic_opt:
 
 void yyerror(char *s)
 {
-    fprintf(stderr, "error: %s\n", s); //syntax error - TODO: format
+    setError(2, s); //syntax error
 }

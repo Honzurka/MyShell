@@ -1,5 +1,6 @@
 #include "parser.tab.h"
 #include "scanner.h"
+#include "globalError.h"
 #include <dirent.h>
 #include <err.h>
 #include <stdio.h>
@@ -47,16 +48,19 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
     return result;
 }
 
-void processLine(char* line)
+/*
+* returns 0 if processing was successful
+* otherwise returns 1 ----------------------------------- maybe set some global error flag?
+*/
+int processLine(char* line)
 {
     // printf("dbg: processing line: %s\n", line);
 
     YY_BUFFER_STATE buf = yy_scan_string(line);
-    if (yyparse() != 0)
-    {
-        exit(1); //error already printed in parser
-    }
+    int retval = yyparse();
     yy_delete_buffer(buf);
+
+    return retval;
 }
 
 void processInteractive()
