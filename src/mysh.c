@@ -49,7 +49,7 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
 
 void processLine(char* line)
 {
-    printf("dbg: processing line: %s\n", line);
+    // printf("dbg: processing line: %s\n", line);
 
     YY_BUFFER_STATE buf = yy_scan_string(line);
     if (yyparse() != 0)

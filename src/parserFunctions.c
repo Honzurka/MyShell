@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <err.h>
+#include <sys/wait.h>
 
 /*
 * Concatenates two strings, freeing the originals
@@ -19,12 +20,10 @@ char* concatArgs(char* str1, char* str2)
     char* result = malloc(len + 2);
     if (result == NULL)
     {
-        err(1, "malloc failed");
+        err(1, "malloc failed\n");
     }
 
-    strcat(result, str1);
-    strcat(result, " ");
-    strcat(result, str2);
+    sprintf(result, "%s %s", str1, str2);
 
     free(str1);
     free(str2);
@@ -53,7 +52,7 @@ char** createArgArray(char* name, char* args)
     char** result = malloc(argCount * sizeof(char*));
     if (result == NULL)
     {
-        err(1, "malloc failed");
+        err(1, "malloc failed\n");
     }
 
     result[0] = name;
@@ -70,27 +69,81 @@ char** createArgArray(char* name, char* args)
     return result;
 }
 
-void runCommand(char* path, char* args)
+/*
+* returns absolute path to program
+* or NULL if not found
+*/
+char* findProgramInPATH(char* progName)
 {
-    printf("dbg: running command: %s with args %s\n", path, args);
+    char* result = NULL;
+
+    char* path = getenv("PATH");
+    if (path == NULL)
+    {
+        err(1, "PATH not set\n");
+    }
 
     char* pathCopy = strdup(path);
     if (pathCopy == NULL)
     {
-        err(1, "strdup failed");
+        err(1, "strdup failed\n");
+    }
+
+    char* token = strtok(pathCopy, ":");
+    while (token != NULL)
+    {
+        char progPath[strlen(token) + strlen(progName) + 2];
+        sprintf(progPath, "%s/%s", token, progName);
+        if (access(progPath, F_OK) == 0)
+        {
+            result = strdup(progPath);
+            break;
+        }
+        token = strtok(NULL, ":");
+    }
+
+    free(pathCopy);
+    return result;
+}
+
+int waitForChild()
+{
+    int status;
+    wait(&status);
+    return status;
+}
+
+void runCommand(char* path, char* args)
+{
+    // printf("dbg: running command: %s with args %s\n", path, args);
+
+    char* pathCopy = strdup(path);
+    if (pathCopy == NULL)
+    {
+        err(1, "strdup failed\n");
     }
 
     char* name = basename(pathCopy);
     if (strcmp(path, name) == 0)
     {
-        //search for name in PATH => update path
+        free(path);
+        path = findProgramInPATH(name);
     }
 
     char** argArr = createArgArray(name, args);
 
-    // todo: fork
-    execv(path, argArr);
-    printf("finished execv\n");
+    pid_t pid = fork();
+    switch (pid) {
+        case -1:
+            err(1, "fork failed\n");
+            break;
+        case 0: //child
+            execv(path, argArr);
+            break;
+        default: //parent
+            waitForChild(); //TODO: handle retval
+            break;
+    }
 
     free(path);
     free(pathCopy);
