@@ -2,6 +2,8 @@
 
 %{
     #include <stdio.h>
+    #include <string.h>
+
     int yylex();
     void yyerror(char *s);
 %}
@@ -25,12 +27,12 @@ command_list:
 
 command:
     name args   {
-        printf("name: %s args: %s\n", $1, $2);
-        
-        //free strduped strings
-        free($1);
-        free($2);
-        }
+                    // TODO: process command
+                    printf("name: %s args: %s\n", $1, $2);
+                    
+                    free($1);
+                    free($2);
+                }
     ;
 
 name:
@@ -38,11 +40,28 @@ name:
     ;
 
 args:
-    %empty
+    %empty      {
+                    $$ = NULL;
+                }
     | args STR  {
-                    //TODO: strcat + free
-                    printf("new arg: %s\n", $2);
-                    $$ = $2;
+                    if ($1 == NULL) {
+                        $$ = $2;
+                    }
+                    else {
+                        int len = 0;
+                        len += strlen($1);
+                        len += strlen($2);
+
+                        char* result = malloc(len + 2);
+                        strcat(result, $1);
+                        strcat(result, " ");
+                        strcat(result, $2);
+
+                        free($1);
+                        free($2);
+
+                        $$ = result;
+                    }
                 }
     ;
 
@@ -55,5 +74,5 @@ semic_opt:
 
 void yyerror(char *s)
 {
-  fprintf(stderr, "error: %s\n", s); //syntax error - TODO: format
+    fprintf(stderr, "error: %s\n", s); //syntax error - TODO: format
 }
