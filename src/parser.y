@@ -1,17 +1,15 @@
 %define api.value.type {char*}
 
 %{
-    #include <stdio.h>
-    #include <string.h>
+    #include <stdio.h> //dbg
+    #include "parserFunctions.h"
 
     int yylex();
     void yyerror(char *s);
 %}
 
 %token  SEMIC   ";"
-%token  STR     //"string without whitespace"
-
-// %type<char*> name args
+%token  STR     "string without whitespace"
 
 %%
 
@@ -27,11 +25,7 @@ command_list:
 
 command:
     name args   {
-                    // TODO: process command
-                    printf("name: %s args: %s\n", $1, $2);
-                    
-                    free($1);
-                    free($2);
+                    runCommand($1, $2);
                 }
     ;
 
@@ -44,23 +38,13 @@ args:
                     $$ = NULL;
                 }
     | args STR  {
-                    if ($1 == NULL) {
+                    if ($1 == NULL)
+                    {
                         $$ = $2;
                     }
-                    else {
-                        int len = 0;
-                        len += strlen($1);
-                        len += strlen($2);
-
-                        char* result = malloc(len + 2);
-                        strcat(result, $1);
-                        strcat(result, " ");
-                        strcat(result, $2);
-
-                        free($1);
-                        free($2);
-
-                        $$ = result;
+                    else
+                    {
+                        $$ = concatArgs($1, $2);
                     }
                 }
     ;

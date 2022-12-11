@@ -1,5 +1,3 @@
-#DBG: prvni 3 radky OK - bison build+flex part
-
 # Name of the executable
 EXE = mysh
 
@@ -11,7 +9,7 @@ BISON = bison
 FLEX = flex
 
 # Compiler flags
-OBJECT_FLAGS = -I./include #-Wall -Wextra #maybe unnecessary - get rid of -Wall
+OBJECT_FLAGS = -I./include -g#-Wall -Wextra
 CFLAGS = -I./include -Wall -Wextra -std=c99 -g -lfl -lreadline -g # -g for debugging
 
 # List of source files

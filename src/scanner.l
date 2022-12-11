@@ -16,6 +16,12 @@
                 }
 [^ \t\n;]+      {
                     yylval = strdup(yytext);
+                    if (yylval == NULL)
+                    {
+                        fprintf(stderr, "out of memory\n");
+                        exit(1);
+                    }
+
                     return STR;
                 }
 
