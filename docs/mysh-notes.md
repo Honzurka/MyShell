@@ -15,11 +15,11 @@
     - popen, system => fork
 
 ## Phase 1
-- use existing `path` from parent shell
+- **DONE** use existing `path` from parent shell
 - `^C = SIGINT` clears line (wont kill shell)
     - but `kills child` process
-- empty cmd => new prompt
-- command execution
+- **DONE** empty cmd => new prompt
+- **DONE** command execution
     - `cmd args`
     - separation by `;`
 - `^D/exit` to exit shell
@@ -28,7 +28,7 @@
     - `cd` == HOME
     - `cd -` go to previous dir (its enough to remember 2 (PWD+OLDPWD))
     - `cd dir`
-- `-c option`: execute cmd and exit
+- **DONE**`-c option`: execute cmd and exit
 - support for `cmd #comment`
 - non-interactive mode: `mysh test.sh`
     - exit on first error

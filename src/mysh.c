@@ -89,18 +89,23 @@ void processInteractive()
 void processScript(char** argv, int argvIdx)
 {
     char* fileName = argv[argvIdx];
-    int fd;
-    if ((fd = open(fileName, O_RDONLY)) == -1) {
+    FILE* file = fopen(fileName, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "can't open %s: %s\n", fileName, strerror(errno));
         err(1, "Unable to open script file.\n");
     }
 
-    // while(char* line = getline())
-    // {
-    //     processLine(line);
-    // }
-    //TODO----------------------------------------------------------probably cant use getline()--------------------------------
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    while ((read = getline(&line, &len, file)) != -1) {
+        line[strcspn(line, "\n")] = 0; // strips newline
+        processLine(line); //TODO: error handling-------------------------
+    }
 
-    close(fd);
+    free(line);
+    fclose(file);
 }
 
 void processCommandString(int argc, char** argv, int argvIdx)
