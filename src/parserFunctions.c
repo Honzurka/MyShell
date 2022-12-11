@@ -48,7 +48,12 @@ int charOccurencesInStr(char c, char* str)
 */
 char** createArgArray(char* name, char* args)
 {
-    int argCount = charOccurencesInStr(' ', args) + 3; // +1 for name, +1 for last string, +1 for last NULL
+    int argCount = 2; //1 for name, 1 for last NULL
+    if (args != NULL)
+    {
+        argCount += charOccurencesInStr(' ', args) + 1;
+    }
+
     char** result = malloc(argCount * sizeof(char*));
     if (result == NULL)
     {
@@ -57,13 +62,17 @@ char** createArgArray(char* name, char* args)
 
     result[0] = name;
     result[argCount - 1] = NULL;
-    size_t i = 1;
-    char* token = strtok(args, " ");
-    while (token != NULL)
+
+    if (args != NULL)
     {
-        result[i] = token;
-        i++;
-        token = strtok(NULL, " ");
+        size_t i = 1;
+        char* token = strtok(args, " ");
+        while (token != NULL)
+        {
+            result[i] = token;
+            i++;
+            token = strtok(NULL, " ");
+        }
     }
 
     return result;
@@ -141,7 +150,7 @@ void runCommand(char* path, char* args)
             execv(path, argArr);
             break;
         default: //parent
-            waitForChild(); //TODO: handle retval
+            waitForChild(); //TODO: handle retval-----------------
             break;
     }
 
