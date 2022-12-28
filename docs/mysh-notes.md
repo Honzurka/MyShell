@@ -33,7 +33,7 @@
 - **DONE** non-interactive mode: `mysh test.sh`
     - exit on first error
         - prints lineNum + errormsg
-- **SEMI_DONE:TODO signals** retval == retval of last command
+- **DONE** retval == retval of last command
     - 127 == unknown command
     - 128+sigNum `killed by sigNum`- if child process is signalled
 - **DONE** errors+warnings -> `stderr`

@@ -1,5 +1,6 @@
 #include "parserFunctions.h"
 #include "globalError.h"
+#include "customCommands.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -123,7 +124,7 @@ void waitForChild()
     handleChildStatus(status);
 }
 
-void runCommand(char* path, char* args)
+void handleCommand(char* path, char* args)
 {
     // printf("dbg: running command: %s with args %s\n", path, args);
 
@@ -151,7 +152,7 @@ void runCommand(char* path, char* args)
             execv(path, argArr);
             break;
         default: //parent
-            waitForChild(); //TODO: handle retval-----------------
+            waitForChild();
             break;
     }
 
@@ -159,4 +160,20 @@ void runCommand(char* path, char* args)
     free(pathCopy);
     free(args);
     free(argArr);
+}
+
+void runCommand(char* path, char* args)
+{
+    int customCommandID = getCustomCommandID(path);
+    if (customCommandID != -1)
+    {
+        char** argArr = createArgArray(path, args);
+        handleCustomCommand(customCommandID, argArr);
+        free(path);
+        free(args);
+    }
+    else
+    {
+        handleCommand(path, args);
+    }
 }
