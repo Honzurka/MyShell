@@ -35,6 +35,8 @@ void reportError() //what errors are reported? if only `syntax errors`, then mov
     {
         fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
     }
+
+    //TODO 127? --- unknown command----------------
 }
 
 char* allocateString(char* str)

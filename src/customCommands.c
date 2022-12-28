@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h> //dbg
 #include <stdlib.h>
-
+#include <err.h>
 
 typedef void (*CommandHandler)(char** args);
 CommandHandler customHandlers[] = {
@@ -43,5 +43,29 @@ void handleExit(char** args)
 
 void handleCd(char** args)
 {
-    printf("cd handler called\n"); //TODO-----------------
+    char* dir = args[1];
+    if (dir == NULL)
+    {
+        dir = getenv("HOME");
+    }
+    else if (strcmp(dir, "-") == 0)
+    {
+        dir = getenv("OLDPWD");
+    }
+
+    char* cwd = getenv("PWD");
+    if (dir == NULL || cwd == NULL)
+    {
+        err(1, "cd failed\n");
+    }
+
+    if (setenv("OLDPWD", cwd, 1) != 0)
+    {
+        err(1, "cd failed\n");
+    }
+
+    if (setenv("PWD", dir, 1) != 0)
+    {
+        err(1, "cd failed\n");
+    }
 }
