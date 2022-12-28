@@ -3,6 +3,7 @@
 
 #define GENERAL_ERROR 1
 #define SYNTAX_ERROR 2
+#define UNKNOWN_COMMAND_ERROR 127
 #define SIGNAL_BASE 128
 
 extern int errorCode;

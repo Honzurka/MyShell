@@ -28,19 +28,21 @@ void resetError()
     errorLine = 0;
 }
 
-void reportError() //what errors are reported? if only `syntax errors`, then move this into parser------------
+void reportError()
 {
-    if (errorCode == SYNTAX_ERROR)
-    {
-        fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
+    switch (errorCode) {
+        case SYNTAX_ERROR:
+            fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
+            break;
+        case GENERAL_ERROR:
+            fprintf(stderr, "error: %s\n", errorMessage);
+            break;
+        case UNKNOWN_COMMAND_ERROR:
+            fprintf(stderr, "unknown command: %s\n", errorMessage);
+            break;
+        default:
+            break;
     }
-
-    if (errorCode == GENERAL_ERROR)
-    {
-        fprintf(stderr, "error: %s\n", errorMessage);
-    }
-
-    //TODO 127? --- unknown command----------------
 }
 
 void handleChildStatus(int status) //MAYBE TODO: fix line numbers --- probably has to be done in parser---------------------------------
