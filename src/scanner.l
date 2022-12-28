@@ -1,4 +1,3 @@
-/*%option header-file="scanner.h"*/
 
 %{
     #include "parser.tab.h"
@@ -6,8 +5,13 @@
     #include <string.h>
 %}
 
+%option yylineno
+
 %%
+\n  { /*increments yylineno*/ }
+
     /* TODO # comments*/
+
 
 [ \t]+	/* whitespace */
 

@@ -104,8 +104,13 @@ void processScript(char** argv, int argvIdx)
     size_t len = 0;
     ssize_t read;
     while ((read = getline(&line, &len, file)) != -1) {
-        line[strcspn(line, "\n")] = 0; // strips newline
-        processLine(line); //TODO: error handling-------------------------
+        processLine(line);
+        
+        if (errorCode != 0)
+        {
+            reportError();
+            exit(errorCode); //TODO: exit-----------------
+        }
     }
 
     free(line);

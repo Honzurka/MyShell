@@ -2,11 +2,15 @@
 
 %{
     #include <stdio.h> //dbg
+    #include <string.h>
     #include "parserFunctions.h"
     #include "globalError.h"
 
     int yylex();
+    
     void yyerror(char *s);
+    extern int yylineno;
+    extern char* yytext;
 %}
 
 %token  SEMIC   ";"
@@ -59,5 +63,11 @@ semic_opt:
 
 void yyerror(char *s)
 {
-    setError(2, s); //syntax error
+    // printf("yytext: %s\n", yytext); //dbg
+
+
+    char* msg = (char*)malloc(strlen(s) + strlen(yytext) + 24);
+    sprintf(msg, "%s near unexpected token %s", s, yytext);
+
+    setError(SYNTAX_ERROR, msg, yylineno);
 }

@@ -1,0 +1,7 @@
+{
+    "C_Cpp.intelliSenseEngine": "Disabled",
+    "files.associations": {
+        "stdio.h": "c",
+        "err.h": "c"
+    }
+}
