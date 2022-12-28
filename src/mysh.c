@@ -57,21 +57,24 @@ void processLine(char* line)
     yy_delete_buffer(buf);
 }
 
-void processInteractive()
+void updatePrompt(char* prompt)
 {
-    // set prompt
+    memset(prompt, 0, MAXNAMLEN);
     char* cwd = getenv("PWD"); 
     if (cwd == NULL) {
         err(1, "PWD not set.\n");
     }
-    char prompt[MAXNAMLEN] = "";
     strcat(prompt, "[MY_SHELL]");
     strcat(prompt, cwd);
     strcat(prompt, ": ");
+}
 
-    // process input
+void processInteractive()
+{
+    char prompt[MAXNAMLEN] = "";
     char* line;
     while(1) {
+        updatePrompt(prompt);
         line = readline(prompt);
 
         processLine(line);
