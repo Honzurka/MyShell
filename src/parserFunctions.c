@@ -31,7 +31,7 @@ char* concatArgs(char* str1, char* str2)
     return result;
 }
 
-int charOccurencesInStr(char c, char* str)
+int countCharOccurencesInStr(char c, char* str)
 {
     int result = 0;
     for (char* str_p = str; *str_p != '\0'; str_p++) {
@@ -51,7 +51,7 @@ char** createArgArray(char* name, char* args)
     int argCount = 2; //1 for name, 1 for last NULL
     if (args != NULL)
     {
-        argCount += charOccurencesInStr(' ', args) + 1;
+        argCount += countCharOccurencesInStr(' ', args) + 1;
     }
 
     char** result = malloc(argCount * sizeof(char*));

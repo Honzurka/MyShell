@@ -11,32 +11,9 @@ extern int errorCode;
 extern char* errorMessage;
 extern int errorLine;
 
-static inline void setError(int code, char* message, int line)
-{
-    free(errorMessage);
-
-    errorCode = code;
-    errorMessage = message;
-    errorLine = line;
-}
-
-static inline void resetError()
-{
-    free(errorMessage);
-
-    errorCode = 0;
-    errorMessage = NULL;
-    errorLine = 0;
-}
-
-static inline void reportError()
-{
-    fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
-}
-
-static inline void exitWithErrorCode()
-{
-    exit(errorCode);
-}
+void setError(int code, char* message, int line);
+void resetError();
+void reportError();
+void exitWithErrorCode();
 
 #endif
