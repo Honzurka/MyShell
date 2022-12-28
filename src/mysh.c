@@ -1,3 +1,7 @@
+/*
+* Only 1 error per line is reported - same behavior as bash
+*/
+
 #include "parser.tab.h"
 #include "scanner.h"
 #include "globalError.h"
@@ -52,6 +56,8 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
 
 void processLine(char* line)
 {
+    resetError();
+
     YY_BUFFER_STATE buf = yy_scan_string(line);
     yyparse(); // error code is handled through globalError
     yy_delete_buffer(buf);
@@ -128,7 +134,7 @@ void processCommandString(int argc, char** argv, int argvIdx)
     processLine(line);
     if (errorCode != 0)
     {
-        reportError(); // MAYBE TODO: only 1 error per line is reported for now
+        reportError();
     }
 }
 
