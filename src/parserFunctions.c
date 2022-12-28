@@ -1,4 +1,5 @@
 #include "parserFunctions.h"
+#include "globalError.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -115,11 +116,11 @@ char* findProgramInPATH(char* progName)
     return result;
 }
 
-int waitForChild()
+void waitForChild()
 {
     int status;
     wait(&status);
-    return status;
+    handleChildStatus(status);
 }
 
 void runCommand(char* path, char* args)

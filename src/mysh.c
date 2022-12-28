@@ -53,10 +53,7 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
 void processLine(char* line)
 {
     YY_BUFFER_STATE buf = yy_scan_string(line);
-    if (yyparse() != 0)
-    {
-        reportError();
-    }
+    yyparse(); // error code is handled through globalError
     yy_delete_buffer(buf);
 }
 
@@ -78,6 +75,10 @@ void processInteractive()
         line = readline(prompt);
 
         processLine(line);
+        if (errorCode != 0)
+        {
+            reportError();
+        }
 
         if (line && *line) {
             add_history(line);
@@ -103,7 +104,8 @@ void processScript(char** argv, int argvIdx)
         processLine(line);
         if (errorCode != 0)
         {
-            exitWithErrorCode();
+            reportError();
+            exit(errorCode);
         }
     }
 
@@ -121,6 +123,10 @@ void processCommandString(int argc, char** argv, int argvIdx)
     }
 
     processLine(line);
+    if (errorCode != 0)
+    {
+        reportError(); // MAYBE TODO: only 1 error per line is reported for now
+    }
 }
 
 int main(int argc, char** argv)
