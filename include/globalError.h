@@ -1,6 +1,7 @@
 #ifndef GLOBAL_ERROR_H
 #define GLOBAL_ERROR_H
 
+#define GENERAL_ERROR 1
 #define SYNTAX_ERROR 2
 #define SIGNAL_BASE 128
 

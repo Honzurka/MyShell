@@ -1,10 +1,13 @@
 #include "customCommands.h"
 #include "globalError.h"
+#include "helpers.h"
 
+#include <errno.h>
 #include <string.h>
 #include <stdio.h> //dbg
 #include <stdlib.h>
 #include <err.h>
+#include <unistd.h>
 
 typedef void (*CommandHandler)(char** args);
 CommandHandler customHandlers[] = {
@@ -54,18 +57,24 @@ void handleCd(char** args)
     }
 
     char* cwd = getenv("PWD");
-    if (dir == NULL || cwd == NULL)
+    if (cwd == NULL || dir == NULL)
     {
-        err(1, "cd failed\n");
+        err(GENERAL_ERROR, "cd failed\n");
+    }
+
+    if (chdir(dir) != 0)
+    {
+        char* msg = allocateString(strerror(errno));
+        setError(GENERAL_ERROR, msg, 0);
+        return;
     }
 
     if (setenv("OLDPWD", cwd, 1) != 0)
     {
-        err(1, "cd failed\n");
+        err(GENERAL_ERROR, "cd failed\n");
     }
-
     if (setenv("PWD", dir, 1) != 0)
     {
-        err(1, "cd failed\n");
+        err(GENERAL_ERROR, "cd failed\n");
     }
 }

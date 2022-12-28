@@ -10,6 +10,8 @@
 #include <err.h>
 #include <sys/wait.h>
 
+extern char** environ;
+
 /*
 * Concatenates two strings, freeing the originals
 */

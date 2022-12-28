@@ -1,8 +1,7 @@
 #include "globalError.h"
+#include "helpers.h"
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
-#include <err.h>
 
 int errorCode = 0;
 char* errorMessage = NULL;
@@ -36,18 +35,12 @@ void reportError() //what errors are reported? if only `syntax errors`, then mov
         fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
     }
 
-    //TODO 127? --- unknown command----------------
-}
-
-char* allocateString(char* str)
-{
-    char* result = malloc(strlen(str) + 1);
-    if (result == NULL)
+    if (errorCode == GENERAL_ERROR)
     {
-        err(1, "malloc failed\n");
+        fprintf(stderr, "error: %s\n", errorMessage);
     }
-    strcpy(result, str);
-    return result;
+
+    //TODO 127? --- unknown command----------------
 }
 
 void handleChildStatus(int status) //MAYBE TODO: fix line numbers --- probably has to be done in parser---------------------------------
