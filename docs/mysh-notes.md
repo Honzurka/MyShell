@@ -30,13 +30,13 @@
     - `cd dir`
 - **DONE**`-c option`: execute cmd and exit
 - support for `cmd #comment`
-- **SEMI_DONE** non-interactive mode: `mysh test.sh`
+- **DONE** non-interactive mode: `mysh test.sh`
     - exit on first error
         - prints lineNum + errormsg
-- retval == retval of last command
+- **SEMI_DONE:TODO signals** retval == retval of last command
     - 127 == unknown command
     - 128+sigNum `killed by sigNum`- if child process is signalled
-- errors+warnings -> `stderr`
+- **DONE** errors+warnings -> `stderr`
 - **DONE** `cwd in prompt`
 
 ## Phase 2

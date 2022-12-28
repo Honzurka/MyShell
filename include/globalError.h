@@ -34,4 +34,9 @@ static inline void reportError()
     fprintf(stderr, "error:%d %s\n", errorLine, errorMessage);
 }
 
+static inline void exitWithErrorCode()
+{
+    exit(errorCode);
+}
+
 #endif

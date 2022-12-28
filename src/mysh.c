@@ -12,6 +12,8 @@
 #include <fcntl.h>
 
 #define MAX_LINE_LEN 4096
+#define UNKNOWN_COMMAND_ERR 127
+
 
 typedef enum
 {
@@ -33,7 +35,7 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
                 result = COMMAND_STRING;
                 break;
             default:
-                err(1, "Unknown option\n");
+                err(UNKNOWN_COMMAND_ERR, "Unknown option\n");
                 break;
         }
     }
@@ -48,19 +50,14 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
     return result;
 }
 
-/*
-* returns 0 if processing was successful
-* otherwise returns 1 ----------------------------------- maybe set some global error flag?
-*/
-int processLine(char* line)
+void processLine(char* line)
 {
-    // printf("dbg: processing line: %s\n", line);
-
     YY_BUFFER_STATE buf = yy_scan_string(line);
-    int retval = yyparse();
+    if (yyparse() != 0)
+    {
+        reportError();
+    }
     yy_delete_buffer(buf);
-
-    return retval;
 }
 
 void processInteractive()
@@ -96,8 +93,7 @@ void processScript(char** argv, int argvIdx)
     FILE* file = fopen(fileName, "r");
     if (file == NULL)
     {
-        fprintf(stderr, "can't open %s: %s\n", fileName, strerror(errno));
-        err(1, "Unable to open script file.\n");
+        err(UNKNOWN_COMMAND_ERR, "Unable to open script file: %s", fileName);
     }
 
     char* line = NULL;
@@ -105,11 +101,9 @@ void processScript(char** argv, int argvIdx)
     ssize_t read;
     while ((read = getline(&line, &len, file)) != -1) {
         processLine(line);
-        
         if (errorCode != 0)
         {
-            reportError();
-            exit(errorCode); //TODO: exit-----------------
+            exitWithErrorCode();
         }
     }
 
@@ -145,8 +139,8 @@ int main(int argc, char** argv)
             processCommandString(argc, argv, argvIdx);
             break;
         default:
-            err(1, "Switch on unknown cmd source.");
+            err(UNKNOWN_COMMAND_ERR, "Switch on unknown cmd source.");
     }
 
-    return 0; // TODO---------
+    return errorCode;
 }
