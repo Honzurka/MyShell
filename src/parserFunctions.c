@@ -11,8 +11,6 @@
 #include <err.h>
 #include <sys/wait.h>
 
-extern char** environ;
-
 /*
  * Concatenates two strings, freeing the originals
  */
@@ -141,6 +139,7 @@ void handleCommand(char* path, char* args) {
         execv(path, argArr);
         break;
     default:   // parent
+        printf("created child with pid: %d\n", pid);
         waitForChild();
         break;
     }

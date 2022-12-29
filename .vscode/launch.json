@@ -8,12 +8,10 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            // "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "program": "${workspaceRoot}/MyShell/mysh",
-            "args": ["error.sh"],
+            "program": "${workspaceRoot}/mysh",
+            "args": [],
             "stopAtEntry": false,
-            // "cwd": "${fileDirname}",
-            "cwd": "${workspaceRoot}/MyShell",
+            "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -24,13 +22,17 @@
                     "ignoreFailures": true
                 },
                 {
-                    "description":  "Set Disassembly Flavor to Intel",
+                    "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "SIGINT: propagate and dont stop",
+                    "text": "handle SIGINT print nostop pass",
+                    "ignoreFailures": false
                 }
             ],
-            // "preLaunchTask": "C/C++: gcc build active file"
+            "preLaunchTask": "Build by make"
         }
-
     ]
 }

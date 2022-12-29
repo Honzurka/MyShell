@@ -1,5 +1,5 @@
 {
-    "C_Cpp.intelliSenseEngine": "Disabled",
+    "C_Cpp.intelliSenseEngine": "disabled",
     "files.associations": {
         "stdio.h": "c",
         "err.h": "c"

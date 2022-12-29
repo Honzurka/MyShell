@@ -127,15 +127,7 @@ void processCommandString(int argc, char** argv, int argvIdx) {
     }
 }
 
-// extern char** environ;
 int main(int argc, char** argv) {
-    // char** envp;
-    // while (envp != NULL)
-    // {
-    //     printf("%s\n", *envp);
-    //     envp++;
-    // }
-
     configureSignalHandling();
 
     int argvIdx = 0;

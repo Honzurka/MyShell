@@ -50,4 +50,4 @@ run-valgrind: all #maybe todo: run valgrind in tests
 
 # Clean up
 clean:
-	rm -f $(EXE) src/*.o src/*.tab.c src/*.tab.h src/*.yy.c src/scanner.h
+	rm -f $(EXE) src/*.o src/*.tab.c src/*.tab.h src/*.yy.c src/scanner.h valgrind.out

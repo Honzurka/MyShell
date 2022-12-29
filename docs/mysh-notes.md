@@ -1,7 +1,12 @@
+# TODOs
+- fix test36
+- add tests as submodule?
+- run valgrind on tests
+
 # General
 - [x] create makefile
     - -Wall, -Wextra 
-- [ ] check c-style
+- [x] check c-style
 - [ ] test on lab machine
 - [ ] checks with valgrind
 
@@ -16,7 +21,7 @@
 
 ## Phase 1
 - **DONE** use existing `path` from parent shell
-- **DONE-bugs with sleep----------------** `^C = SIGINT` clears line (wont kill shell)
+- **DONE** `^C = SIGINT` clears line (wont kill shell)
     - but `kills child` process
 - **DONE** empty cmd => new prompt
 - **DONE** command execution
