@@ -151,7 +151,6 @@ void handleCommand(char* path, char* args)
     }
 
     char** argArr = createArgArray(name, args);
-
     pid_t pid = fork();
     switch (pid) {
         case -1:

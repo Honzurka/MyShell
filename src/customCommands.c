@@ -3,6 +3,7 @@
 #include "helpers.h"
 
 #include <errno.h>
+#include <libgen.h>
 #include <string.h>
 #include <stdio.h> //dbg
 #include <stdlib.h>
@@ -54,6 +55,14 @@ void handleCd(char** args)
     else if (strcmp(dir, "-") == 0)
     {
         dir = getenv("OLDPWD");
+
+        char* dirCopy = strdup(dir);
+        if (dirCopy[strlen(dirCopy) - 1] == '/')
+        {
+            dirCopy[strlen(dirCopy) - 1] = '\0';
+        }
+        printf("%s\n", dirCopy);
+        free(dirCopy);
     }
 
     char* cwd = getenv("PWD");
