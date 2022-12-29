@@ -4,11 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* allocateString(char* str)
-{
+char* allocateString(char* str) {
     char* result = malloc(strlen(str) + 1);
-    if (result == NULL)
-    {
+    if (result == NULL) {
         err(1, "malloc failed\n");
     }
     strcpy(result, str);
@@ -16,13 +14,11 @@ char* allocateString(char* str)
 }
 
 /*
-* Returns the number of arguments in NULL-terminated array of strings.
-*/
-int getArgCount(char** str)
-{
+ * Returns the number of arguments in NULL-terminated array of strings.
+ */
+int getArgCount(char** str) {
     int result = 0;
-    while (str[result] != NULL)
-    {
+    while (str[result] != NULL) {
         result++;
     }
     return result;

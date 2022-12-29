@@ -1,6 +1,6 @@
 /*
-* Only 1 error per line is reported - same behavior as bash
-*/
+ * Only 1 error per line is reported - same behavior as bash
+ */
 
 #include "customSignals.h"
 #include "parser.tab.h"
@@ -21,29 +21,20 @@
 #define MAX_LINE_LEN 4096
 #define UNKNOWN_COMMAND_ERR 127
 
+typedef enum { SCRIPT, COMMAND_STRING, INTERACTIVE } commandSource_t;
 
-typedef enum
-{
-    SCRIPT,
-    COMMAND_STRING,
-    INTERACTIVE
-} commandSource_t;
-
-commandSource_t getSource(int argc, char** argv, int* argStartIdx)
-{
+commandSource_t getSource(int argc, char** argv, int* argStartIdx) {
     commandSource_t result = INTERACTIVE;
 
     int c;
-    while ((c = getopt(argc, argv, "c")) != -1)
-    {
-        switch (c)
-        {
-            case 'c':
-                result = COMMAND_STRING;
-                break;
-            default:
-                err(UNKNOWN_COMMAND_ERR, "Unknown option\n");
-                break;
+    while ((c = getopt(argc, argv, "c")) != -1) {
+        switch (c) {
+        case 'c':
+            result = COMMAND_STRING;
+            break;
+        default:
+            err(UNKNOWN_COMMAND_ERR, "Unknown option\n");
+            break;
         }
     }
 
@@ -57,19 +48,17 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx)
     return result;
 }
 
-void processLine(char* line)
-{
+void processLine(char* line) {
     resetError();
 
     YY_BUFFER_STATE buf = yy_scan_string(line);
-    yyparse(); // error code is handled through globalError
+    yyparse();   // error code is handled through globalError
     yy_delete_buffer(buf);
 }
 
-void updatePrompt(char* prompt)
-{
+void updatePrompt(char* prompt) {
     memset(prompt, 0, MAXNAMLEN);
-    char* cwd = getenv("PWD"); 
+    char* cwd = getenv("PWD");
     if (cwd == NULL) {
         setErrorWithAlloc(GENERAL_ERROR, "PWD not set", 0);
         cwd = "";
@@ -79,11 +68,10 @@ void updatePrompt(char* prompt)
     strcat(prompt, ": ");
 }
 
-void processInteractive()
-{
+void processInteractive() {
     char prompt[MAXNAMLEN] = "";
     char* line;
-    while(1) {
+    while (1) {
         updatePrompt(prompt);
         line = readline(prompt);
         if (line == NULL) {
@@ -91,8 +79,7 @@ void processInteractive()
         }
 
         processLine(line);
-        if (errorCode != 0)
-        {
+        if (errorCode != 0) {
             reportError();
         }
 
@@ -104,12 +91,10 @@ void processInteractive()
     }
 }
 
-void processScript(char** argv, int argvIdx)
-{
+void processScript(char** argv, int argvIdx) {
     char* fileName = argv[argvIdx];
     FILE* file = fopen(fileName, "r");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         err(UNKNOWN_COMMAND_ERR, "Unable to open script file: %s", fileName);
     }
 
@@ -118,8 +103,7 @@ void processScript(char** argv, int argvIdx)
     ssize_t read;
     while ((read = getline(&line, &len, file)) != -1) {
         processLine(line);
-        if (errorCode != 0)
-        {
+        if (errorCode != 0) {
             reportError();
             exit(errorCode);
         }
@@ -129,8 +113,7 @@ void processScript(char** argv, int argvIdx)
     fclose(file);
 }
 
-void processCommandString(int argc, char** argv, int argvIdx)
-{
+void processCommandString(int argc, char** argv, int argvIdx) {
     char line[MAX_LINE_LEN] = {0};
 
     for (int i = argvIdx; i < argc; i++) {
@@ -139,15 +122,13 @@ void processCommandString(int argc, char** argv, int argvIdx)
     }
 
     processLine(line);
-    if (errorCode != 0)
-    {
+    if (errorCode != 0) {
         reportError();
     }
 }
 
 // extern char** environ;
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     // char** envp;
     // while (envp != NULL)
     // {
@@ -160,17 +141,17 @@ int main(int argc, char** argv)
     int argvIdx = 0;
     commandSource_t src = getSource(argc, argv, &argvIdx);
     switch (src) {
-        case INTERACTIVE:
-            processInteractive();
-            break;
-        case SCRIPT:
-            processScript(argv, argvIdx);
-            break;
-        case COMMAND_STRING:
-            processCommandString(argc, argv, argvIdx);
-            break;
-        default:
-            err(UNKNOWN_COMMAND_ERR, "Switch on unknown cmd source.");
+    case INTERACTIVE:
+        processInteractive();
+        break;
+    case SCRIPT:
+        processScript(argv, argvIdx);
+        break;
+    case COMMAND_STRING:
+        processCommandString(argc, argv, argvIdx);
+        break;
+    default:
+        err(UNKNOWN_COMMAND_ERR, "Switch on unknown cmd source.");
     }
 
     return errorCode;

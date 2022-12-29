@@ -2,81 +2,64 @@
 #include "globalError.h"
 #include "helpers.h"
 
+#include <err.h>
 #include <errno.h>
 #include <libgen.h>
-#include <string.h>
-#include <stdio.h> //dbg
+#include <stdio.h>   //dbg
 #include <stdlib.h>
-#include <err.h>
+#include <string.h>
 #include <unistd.h>
 
 typedef void (*CommandHandler)(char** args);
-CommandHandler customHandlers[] = {
-    handleExit,
-    handleCd
-};
+CommandHandler customHandlers[] = {handleExit, handleCd};
 
-char* customCommands[] = {
-    "exit",
-    "cd"
-};
+char* customCommands[] = {"exit", "cd"};
 
-
-int getCustomCommandID(char* command)
-{
-    for (int i = 0; i < sizeof(customCommands) / sizeof(customCommands[0]); i++)
-    {
-        if (strcmp(command, customCommands[i]) == 0)
-        {
+int getCustomCommandID(char* command) {
+    for (int i = 0; i < sizeof(customCommands) / sizeof(customCommands[0]);
+         i++) {
+        if (strcmp(command, customCommands[i]) == 0) {
             return i;
         }
     }
     return -1;
 }
 
-void handleCustomCommand(int commandID, char** args)
-{
+void handleCustomCommand(int commandID, char** args) {
     customHandlers[commandID](args);
     free(args);
 }
 
-void handleExit(char** args)
-{
-    //MAYBE TODO: handle `exit argVal`
+void handleExit(char** args) {
+    // MAYBE TODO: handle `exit argVal`
     exit(errorCode);
 }
 
-void handleCd(char** args)
-{
+void handleCd(char** args) {
     int argCount = getArgCount(args);
-    if (argCount > 2)
-    {
+    if (argCount > 2) {
         setErrorWithAlloc(GENERAL_ERROR, "cd: too many arguments", 0);
         return;
     }
 
     char* dir = args[1];
-    if (dir == NULL) // no arg
+    if (dir == NULL)   // no arg
     {
         dir = getenv("HOME");
-        if (dir == NULL)
-        {
+        if (dir == NULL) {
             setErrorWithAlloc(GENERAL_ERROR, "HOME not set", 0);
             return;
         }
-    }
-    else if (strcmp(dir, "-") == 0) // arg is '-'
+    } else if (strcmp(dir, "-") == 0)   // arg is '-'
     {
         dir = getenv("OLDPWD");
-        if (dir == NULL)
-        {
+        if (dir == NULL) {
             setErrorWithAlloc(GENERAL_ERROR, "OLDPWD not set", 0);
             return;
         }
 
         char* dirCopy = strdup(dir);
-        if (dirCopy[strlen(dirCopy) - 1] == '/')
-        {
+        if (dirCopy[strlen(dirCopy) - 1] == '/') {
             dirCopy[strlen(dirCopy) - 1] = '\0';
         }
         printf("%s\n", dirCopy);
@@ -85,25 +68,21 @@ void handleCd(char** args)
 
     int replaceOLDPWD = 1;
     char* cwd = getenv("PWD");
-    if (cwd == NULL)
-    {
+    if (cwd == NULL) {
         setErrorWithAlloc(GENERAL_ERROR, "PWD not set", 0);
         cwd = "";
         replaceOLDPWD = 0;
     }
 
     // change dir and env vars
-    if (chdir(dir) != 0)
-    {
+    if (chdir(dir) != 0) {
         setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
         return;
     }
-    if (setenv("OLDPWD", cwd, replaceOLDPWD) != 0)
-    {
+    if (setenv("OLDPWD", cwd, replaceOLDPWD) != 0) {
         err(GENERAL_ERROR, "Unable to set OLDPWD\n");
     }
-    if (setenv("PWD", dir, 1) != 0)
-    {
+    if (setenv("PWD", dir, 1) != 0) {
         err(GENERAL_ERROR, "Unable to set PWD\n");
     }
 }

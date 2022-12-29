@@ -61,11 +61,7 @@ semic_opt:
 
 %%
 
-void yyerror(char *s)
-{
-    // printf("yytext: %s\n", yytext); //dbg
-
-
+void yyerror(char *s) {
     char* msg = (char*)malloc(strlen(s) + strlen(yytext) + 24);
     sprintf(msg, "%s near unexpected token %s", s, yytext);
 
