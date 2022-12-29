@@ -1,4 +1,4 @@
-%define api.value.type {char*}
+// %define api.value.type {char*}
 
 %{
     #include <stdio.h> //dbg
@@ -13,12 +13,18 @@
     extern char* yytext;
 %}
 
-%token  LANGLE  "<"
-%token  RANGLE  ">"
-%token  RANGLE2 ">>"
-%token  PIPE    "|"
-%token  SEMIC   ";"
-%token  STR     "string without whitespace"
+%union {
+    char* str;
+}
+
+%token      LANGLE  "<"
+%token      RANGLE  ">"
+%token      RANGLE2 ">>"
+%token      PIPE    "|"
+%token      SEMIC   ";"
+%token<str> STR     "string without whitespace"
+
+%type<str> name args
 
 %%
 
@@ -60,6 +66,10 @@ command_list_req:
 command_with_redirects:
     redirect_list name redirect_list args redirect_list
     {
+        //todo: types
+        // determine input and output redirect for command
+        // build command -> will be run later
+
         runCommand($2, $4); //wont be directly executed with pipes------------------------instead it will be passed up to pipe chain
     }
     ;
@@ -79,7 +89,7 @@ args:
                     }
                     else
                     {
-                        $$ = concatArgs($1, $2);
+                        $$ = concatArgs($1, $2); // maybe todo: could be improved with types
                     }
                 }
     ;

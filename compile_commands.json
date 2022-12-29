@@ -1,0 +1,44 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-I./include",
+      "-g",
+      "-c",
+      "-o",
+      "src/globalError.o",
+      "src/globalError.c"
+    ],
+    "directory": "/home/honzurka/Workspace/School/LinuxInC/MyShell",
+    "file": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/globalError.c",
+    "output": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/globalError.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-I./include",
+      "-g",
+      "-c",
+      "-o",
+      "src/mysh.o",
+      "src/mysh.c"
+    ],
+    "directory": "/home/honzurka/Workspace/School/LinuxInC/MyShell",
+    "file": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/mysh.c",
+    "output": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/mysh.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-I./include",
+      "-g",
+      "-c",
+      "-o",
+      "src/parserFunctions.o",
+      "src/parserFunctions.c"
+    ],
+    "directory": "/home/honzurka/Workspace/School/LinuxInC/MyShell",
+    "file": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/parserFunctions.c",
+    "output": "/home/honzurka/Workspace/School/LinuxInC/MyShell/src/parserFunctions.o"
+  }
+]

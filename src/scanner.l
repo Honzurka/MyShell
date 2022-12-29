@@ -32,8 +32,8 @@
                     return SEMIC;
                 }
 [^ \t\n;<>|]+      {
-                    yylval = strdup(yytext);
-                    if (yylval == NULL)
+                    yylval.str = strdup(yytext);
+                    if (yylval.str == NULL)
                     {
                         fprintf(stderr, "out of memory\n");
                         exit(1);
