@@ -16,13 +16,13 @@
 
 ## Phase 1
 - **DONE** use existing `path` from parent shell
-- `^C = SIGINT` clears line (wont kill shell)
+- **DONE-bugs with sleep** `^C = SIGINT` clears line (wont kill shell)
     - but `kills child` process
 - **DONE** empty cmd => new prompt
 - **DONE** command execution
     - `cmd args`
     - separation by `;`
-- **SEMI_DONE: todo signals** `^D/exit` to exit shell
+- **SEMI_DONE** `^D/exit` to exit shell
     - shouldn't change `retval` from previous execution
 - **DONE** `cd` - must set `$PWD, $OLDPWD`
     - `cd` == HOME

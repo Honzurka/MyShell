@@ -8,6 +8,7 @@
 
 void sigint_handler(int signum)
 {
+    //MAYBE TODO: ignore other signals
     write(STDOUT_FILENO, "\n", 1); //signal-safe alternative to printf
     
     RL_UNSETSTATE(RL_STATE_ISEARCH|RL_STATE_NSEARCH|RL_STATE_VIMOTION|RL_STATE_NUMERICARG|RL_STATE_MULTIKEY);
@@ -19,13 +20,12 @@ void sigint_handler(int signum)
 void configureSignalHandling()
 {
     struct sigaction sigint_sa;
-    sigint_sa.sa_handler = sigint_handler;
     sigemptyset(&sigint_sa.sa_mask);
     sigint_sa.sa_flags = 0;
+
+    sigint_sa.sa_handler = sigint_handler;
     if (sigaction(SIGINT, &sigint_sa, NULL) != 0)
     {
         err(1, "Can't catch SIGINT\n");
     }
-
-    //... other signals
 }

@@ -85,6 +85,9 @@ void processInteractive()
     while(1) {
         updatePrompt(prompt);
         line = readline(prompt);
+        if (line == NULL) {
+            exit(errorCode);
+        }
 
         processLine(line);
         if (errorCode != 0)
