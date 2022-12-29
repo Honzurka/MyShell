@@ -14,3 +14,16 @@ char* allocateString(char* str)
     strcpy(result, str);
     return result;
 }
+
+/*
+* Returns the number of arguments in NULL-terminated array of strings.
+*/
+int getArgCount(char** str)
+{
+    int result = 0;
+    while (str[result] != NULL)
+    {
+        result++;
+    }
+    return result;
+}

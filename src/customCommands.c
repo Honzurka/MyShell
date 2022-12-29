@@ -42,11 +42,20 @@ void handleCustomCommand(int commandID, char** args)
 
 void handleExit(char** args)
 {
+    //MAYBE TODO: handle `exit argVal`
     exit(errorCode);
 }
 
 void handleCd(char** args)
 {
+    int argCount = getArgCount(args);
+    if (argCount > 2)
+    {
+        char* msg = allocateString("cd: too many arguments");
+        setError(GENERAL_ERROR, msg, 0);
+        return;
+    }
+
     char* dir = args[1];
     if (dir == NULL)
     {
