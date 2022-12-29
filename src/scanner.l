@@ -6,6 +6,8 @@
 %}
 
 %option yylineno
+%option nounput
+%option noinput
 
 %%
 \n  { /*increments yylineno*/ }

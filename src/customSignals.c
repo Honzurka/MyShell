@@ -6,7 +6,8 @@
 #include <readline/readline.h>
 #include <unistd.h>
 
-void sigint_handler(int signum) {
+void sigintHandler(int signum) {
+    (void)signum;
     // MAYBE TODO: ignore other signals
     write(STDOUT_FILENO, "\n", 1);   // signal-safe alternative to printf
 
@@ -22,7 +23,7 @@ void configureSignalHandling() {
     sigemptyset(&sigint_sa.sa_mask);
     sigint_sa.sa_flags = 0;
 
-    sigint_sa.sa_handler = sigint_handler;
+    sigint_sa.sa_handler = sigintHandler;
     if (sigaction(SIGINT, &sigint_sa, NULL) != 0) {
         err(1, "Can't catch SIGINT\n");
     }
