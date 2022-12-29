@@ -19,17 +19,17 @@ void sigintHandler(int signum) {
 }
 
 void configureSignalHandling() {
-    struct sigaction sigint_sa;
-    sigemptyset(&sigint_sa.sa_mask);
-    sigint_sa.sa_flags = 0;
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
 
-    sigint_sa.sa_handler = sigintHandler;
-    if (sigaction(SIGINT, &sigint_sa, NULL) != 0) {
+    sa.sa_handler = sigintHandler;
+    if (sigaction(SIGINT, &sa, NULL) != 0) {
         err(1, "Can't catch SIGINT\n");
     }
 
-    sigint_sa.sa_handler = SIG_IGN;
-    if (sigaction(SIGCHLD, &sigint_sa, NULL) != 0) {
+    sa.sa_handler = SIG_IGN;
+    if (sigaction(SIGCHLD, &sa, NULL) != 0) {
         err(1, "Can't catch SIGCHLD\n");
     }
 }
