@@ -1,0 +1,3 @@
+[submodule "libs/stef"]
+	path = libs/stef
+	url = https://github.com/devnull-cz/stef
