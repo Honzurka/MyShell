@@ -13,25 +13,55 @@
     extern char* yytext;
 %}
 
+%token  LANGLE  "<"
+%token  RANGLE  ">"
+%token  RANGLE2 ">>"
+%token  PIPE    "|"
 %token  SEMIC   ";"
 %token  STR     "string without whitespace"
 
 %%
 
-commands:
-    command_list semic_opt
+start:
+    pipe_list commands
     ;
 
-command_list:
+pipe_list:
     %empty
-    | command
-    | command_list SEMIC command
+    | command_list_req PIPE
+    | pipe_list command_list_req PIPE
     ;
 
-command:
-    name args   {
-                    runCommand($1, $2);
-                }
+redirect_list:
+    %empty
+    | redirect_list redirect
+    ;
+
+redirect:
+    LANGLE STR
+    | RANGLE STR
+    | RANGLE2 STR
+    ;
+
+commands:
+    command_list_opt semic_opt
+    ;
+
+command_list_opt:
+    %empty
+    | command_list_req
+    ;
+
+command_list_req:
+    command_with_redirects
+    | command_list_opt SEMIC command_with_redirects
+    ;
+
+command_with_redirects:
+    redirect_list name redirect_list args redirect_list
+    {
+        runCommand($2, $4); //wont be directly executed with pipes------------------------instead it will be passed up to pipe chain
+    }
     ;
 
 name:

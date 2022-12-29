@@ -16,10 +16,22 @@
 
 [ \t]+	/* whitespace */
 
+"<"             {
+                    return LANGLE;
+                }
+">"             {
+                    return RANGLE;
+                }
+">>"            {
+                    return RANGLE2;
+                }
+"|"             {
+                    return PIPE;
+                }
 ";"             {
                     return SEMIC;
                 }
-[^ \t\n;]+      {
+[^ \t\n;<>|]+      {
                     yylval = strdup(yytext);
                     if (yylval == NULL)
                     {

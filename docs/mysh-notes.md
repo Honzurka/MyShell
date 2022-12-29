@@ -45,11 +45,11 @@
 - **DONE** `cwd in prompt`
 
 ## Phase 2
-- pipes <----------- use linked list to represent commands (after that cascade free whole list)
+- pipes <----------- use linked list to represent commands (after that cascade-free whole list)
     - shell is parent of all processes
-    - shell waits for all commands in pipeline to finish
+    - shell waits for all commands in pipeline to finish before next prompt
 - redirections
-    - only std `>,<,>>`
+    - only std `>(out, truncate),<(in),>>(out, append)`
     - anywhere on line
         - (if multiple: `> & >>`)   last one is applied
     - combination with pipeline: redirection is applied after each command
