@@ -2,3 +2,4 @@ learning
 compile_commands.json
 .cache
 mysh
+valgrind.out

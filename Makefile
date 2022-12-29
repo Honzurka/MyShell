@@ -41,6 +41,13 @@ $(EXE): $(OBJS)
 %.yy.c %.h: %.l
 	$(FLEX) -o $@ --header-file=$*.h $<
 
+run-valgrind: all #maybe todo: run valgrind in tests
+	valgrind --leak-check=full \
+         --show-leak-kinds=all \
+         --track-origins=yes \
+         --log-file=valgrind.out \
+         ./mysh
+
 # Clean up
 clean:
 	rm -f $(EXE) src/*.o src/*.tab.c src/*.tab.h src/*.yy.c src/scanner.h
