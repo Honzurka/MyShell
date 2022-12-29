@@ -56,13 +56,23 @@ void handleCd(char** args)
     }
 
     char* dir = args[1];
-    if (dir == NULL)
+    if (dir == NULL) // no arg
     {
         dir = getenv("HOME");
+        if (dir == NULL)
+        {
+            setErrorWithAlloc(GENERAL_ERROR, "HOME not set", 0);
+            return;
+        }
     }
-    else if (strcmp(dir, "-") == 0)
+    else if (strcmp(dir, "-") == 0) // arg is '-'
     {
         dir = getenv("OLDPWD");
+        if (dir == NULL)
+        {
+            setErrorWithAlloc(GENERAL_ERROR, "OLDPWD not set", 0);
+            return;
+        }
 
         char* dirCopy = strdup(dir);
         if (dirCopy[strlen(dirCopy) - 1] == '/')
@@ -73,25 +83,27 @@ void handleCd(char** args)
         free(dirCopy);
     }
 
+    int replaceOLDPWD = 1;
     char* cwd = getenv("PWD");
-    if (cwd == NULL || dir == NULL)
+    if (cwd == NULL)
     {
-        err(GENERAL_ERROR, "cd failed\n");
+        setErrorWithAlloc(GENERAL_ERROR, "PWD not set", 0);
+        cwd = "";
+        replaceOLDPWD = 0;
     }
 
+    // change dir and env vars
     if (chdir(dir) != 0)
     {
-        char* msg = allocateString(strerror(errno));
-        setError(GENERAL_ERROR, msg, 0);
+        setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
         return;
     }
-
-    if (setenv("OLDPWD", cwd, 1) != 0)
+    if (setenv("OLDPWD", cwd, replaceOLDPWD) != 0)
     {
-        err(GENERAL_ERROR, "cd failed\n");
+        err(GENERAL_ERROR, "Unable to set OLDPWD\n");
     }
     if (setenv("PWD", dir, 1) != 0)
     {
-        err(GENERAL_ERROR, "cd failed\n");
+        err(GENERAL_ERROR, "Unable to set PWD\n");
     }
 }

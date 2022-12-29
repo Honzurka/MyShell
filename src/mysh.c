@@ -71,7 +71,8 @@ void updatePrompt(char* prompt)
     memset(prompt, 0, MAXNAMLEN);
     char* cwd = getenv("PWD"); 
     if (cwd == NULL) {
-        err(1, "PWD not set.\n");
+        setErrorWithAlloc(GENERAL_ERROR, "PWD not set", 0);
+        cwd = "";
     }
     strcat(prompt, "[MY_SHELL]");
     strcat(prompt, cwd);
@@ -144,8 +145,16 @@ void processCommandString(int argc, char** argv, int argvIdx)
     }
 }
 
+// extern char** environ;
 int main(int argc, char** argv)
 {
+    // char** envp;
+    // while (envp != NULL)
+    // {
+    //     printf("%s\n", *envp);
+    //     envp++;
+    // }
+
     configureSignalHandling();
 
     int argvIdx = 0;
