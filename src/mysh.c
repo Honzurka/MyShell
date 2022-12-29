@@ -2,16 +2,19 @@
 * Only 1 error per line is reported - same behavior as bash
 */
 
+#include "customSignals.h"
 #include "parser.tab.h"
 #include "scanner.h"
 #include "globalError.h"
 #include <dirent.h>
 #include <err.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -140,9 +143,10 @@ void processCommandString(int argc, char** argv, int argvIdx)
 
 int main(int argc, char** argv)
 {
+    configureSignalHandling();
+
     int argvIdx = 0;
     commandSource_t src = getSource(argc, argv, &argvIdx);
-
     switch (src) {
         case INTERACTIVE:
             processInteractive();

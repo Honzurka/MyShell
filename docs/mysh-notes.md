@@ -22,9 +22,9 @@
 - **DONE** command execution
     - `cmd args`
     - separation by `;`
-- `^D/exit` to exit shell
+- **SEMI_DONE: todo signals** `^D/exit` to exit shell
     - shouldn't change `retval` from previous execution
-- `cd` - must set `$PWD, $OLDPWD`
+- **DONE** `cd` - must set `$PWD, $OLDPWD`
     - `cd` == HOME
     - `cd -` go to previous dir (its enough to remember 2 (PWD+OLDPWD))
     - `cd dir`
