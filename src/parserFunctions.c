@@ -160,3 +160,57 @@ void runCommand(char* path, char* args) {
         handleCommand(path, args);
     }
 }
+
+redirect_t createRedirect(char* file, redirectType type) {
+    redirect_t result = {0};
+
+    switch (type) {
+    case INPUT:
+        result.inFile = file;   // malloc?
+    case OUTPUT:
+        result.outFile = file;
+        result.append = 0;
+        break;
+    case APPEND:
+        result.outFile = file;
+        result.append = 1;
+        break;
+    default:
+        err(1, "invalid redirect type\n");
+    }
+
+    return result;
+}
+
+redirect_t combineRedirects(redirect_t this, redirect_t other) {
+    if (other.inFile != NULL) {
+        free(this.inFile);
+        this.inFile = other.inFile;
+    }
+    if (other.outFile != NULL) {
+        free(this.outFile);
+        this.outFile = other.outFile;
+        this.append = other.append;
+    }
+
+    return this;
+}
+
+command_t createCommand(char* name, char* args) {
+    command_t result = {0};
+
+    result.name = name;
+    result.args = args;
+
+    return result;
+}
+
+command_with_redirects_t createCommandWithRedirects(command_t command,
+                                                    redirect_t redirect) {
+    command_with_redirects_t result = {0};
+
+    result.command = command;
+    result.redirect = redirect;
+
+    return result;
+}

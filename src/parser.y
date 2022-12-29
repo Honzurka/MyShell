@@ -15,6 +15,8 @@
 
 %union {
     char* str;
+    redirect_t redir;
+    command_with_redirects_t cwr;
 }
 
 %token      LANGLE  "<"
@@ -25,6 +27,8 @@
 %token<str> STR     "string without whitespace"
 
 %type<str> name args
+%type<redir> redirect redirect_list
+%type<cwr> command_with_redirects
 
 %%
 
@@ -39,14 +43,17 @@ pipe_list:
     ;
 
 redirect_list:
-    %empty
-    | redirect_list redirect
+    %empty                      {
+                                    redirect_t result = {0};
+                                    $$ = result;
+                                }
+    | redirect_list redirect    { $$ = combineRedirects($1, $2); }
     ;
 
 redirect:
-    LANGLE STR
-    | RANGLE STR
-    | RANGLE2 STR
+    LANGLE STR      { $$ = createRedirect($2, INPUT); }
+    | RANGLE STR    { $$ = createRedirect($2, OUTPUT); }
+    | RANGLE2 STR   { $$ = createRedirect($2, APPEND); }
     ;
 
 commands:
@@ -66,10 +73,17 @@ command_list_req:
 command_with_redirects:
     redirect_list name redirect_list args redirect_list
     {
-        //todo: types
-        // determine input and output redirect for command
-        // build command -> will be run later
+        // combine redirs - last one is most important
+        redirect_t finalRedir = $1;
+        finalRedir = combineRedirects(finalRedir, $3);
+        finalRedir = combineRedirects(finalRedir, $5);
 
+        // create command
+        command_t cmd = createCommand($2, $4); //will be run later
+
+        $$ = createCommandWithRedirects(cmd, finalRedir);
+
+        // ...
         runCommand($2, $4); //wont be directly executed with pipes------------------------instead it will be passed up to pipe chain
     }
     ;
