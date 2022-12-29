@@ -128,7 +128,7 @@ void waitForChild()
 
 void handleCommand(char* path, char* args)
 {
-    // printf("dbg: running command: %s with args %s\n", path, args);
+    printf("dbg: running command: %s with args %s\n", path, args);
 
     char* pathCopy = strdup(path);
     if (pathCopy == NULL)

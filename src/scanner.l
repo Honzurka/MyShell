@@ -10,8 +10,7 @@
 %%
 \n  { /*increments yylineno*/ }
 
-    /* TODO # comments*/
-
+#.* { /* comment */ }
 
 [ \t]+	/* whitespace */
 

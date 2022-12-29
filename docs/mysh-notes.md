@@ -29,7 +29,7 @@
     - `cd -` go to previous dir (its enough to remember 2 (PWD+OLDPWD))
     - `cd dir`
 - **DONE**`-c option`: execute cmd and exit
-- support for `cmd #comment`
+- **DONE** support for `cmd #comment`
 - **DONE** non-interactive mode: `mysh test.sh`
     - exit on first error
         - prints lineNum + errormsg
