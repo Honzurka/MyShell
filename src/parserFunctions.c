@@ -1,6 +1,7 @@
 #include "parserFunctions.h"
 #include "globalError.h"
 #include "customCommands.h"
+#include "helpers.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -128,7 +129,7 @@ void waitForChild()
 
 void handleCommand(char* path, char* args)
 {
-    printf("dbg: running command: %s with args %s\n", path, args);
+    // printf("dbg: running command: %s with args %s\n", path, args);
 
     char* pathCopy = strdup(path);
     if (pathCopy == NULL)
@@ -141,6 +142,12 @@ void handleCommand(char* path, char* args)
     {
         free(path);
         path = findProgramInPATH(name);
+    }
+    if (path == NULL)
+    {
+        char* msg = allocateString("command not found...");
+        setError(UNKNOWN_COMMAND_ERROR, msg, 0);
+        return;
     }
 
     char** argArr = createArgArray(name, args);
