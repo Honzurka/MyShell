@@ -11,6 +11,7 @@ extern char* errorMessage;
 extern int errorLine;
 
 void setError(int code, char* message, int line);
+void setErrorWithAlloc(int code, char* message, int line);
 void resetError();
 void reportError();
 void handleChildStatus(int status);

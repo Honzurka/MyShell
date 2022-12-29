@@ -51,8 +51,7 @@ void handleCd(char** args)
     int argCount = getArgCount(args);
     if (argCount > 2)
     {
-        char* msg = allocateString("cd: too many arguments");
-        setError(GENERAL_ERROR, msg, 0);
+        setErrorWithAlloc(GENERAL_ERROR, "cd: too many arguments", 0);
         return;
     }
 

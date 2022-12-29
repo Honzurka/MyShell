@@ -19,6 +19,12 @@ void setError(int code, char* message, int line)
     errorLine = line;
 }
 
+void setErrorWithAlloc(int code, char* message, int line)
+{
+    char* msg = allocateString(message);
+    setError(code, msg, line);
+}
+
 void resetError()
 {
     free(errorMessage);
@@ -49,14 +55,12 @@ void handleChildStatus(int status) //MAYBE TODO: fix line numbers --- probably h
 {
     if (WIFEXITED(status))
     {
-        char* msg = allocateString("Child process exited");
-        setError(WEXITSTATUS(status), msg, 0);
+        setErrorWithAlloc(WEXITSTATUS(status), "Child process exited", 0);
     }
 
     if (WIFSIGNALED(status))
     {
-        char* msg = allocateString("Child process was signaled");
-        setError(SIGNAL_BASE + WTERMSIG(status), msg, 0);
+        setErrorWithAlloc(SIGNAL_BASE + WTERMSIG(status), "Child process was signaled", 0);
         //TODO?: WCOREDUMP
         //TODO?: WSTOPSIG+WIFCONTINUED
     }

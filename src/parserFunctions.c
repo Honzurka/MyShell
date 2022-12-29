@@ -145,8 +145,7 @@ void handleCommand(char* path, char* args)
     }
     if (path == NULL)
     {
-        char* msg = allocateString("command not found...");
-        setError(UNKNOWN_COMMAND_ERROR, msg, 0);
+        setErrorWithAlloc(UNKNOWN_COMMAND_ERROR, "command not found...", 0);
         return;
     }
 
