@@ -10,7 +10,6 @@
 #include <string.h>
 #include <libgen.h>
 #include <unistd.h>
-#include <sys/wait.h>
 #include <fcntl.h>
 
 /*
@@ -74,12 +73,6 @@ char* findProgramInPATH(char* progName) {
 
     free(pathCopy);
     return result;
-}
-
-void waitForChild() {
-    int status = 0;
-    wait(&status);
-    handleChildStatus(status);
 }
 
 void handleCommand(char* path, char* args) {

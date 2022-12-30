@@ -1,8 +1,9 @@
 #include "helpers.h"
-
+#include "globalError.h"
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 
 char* allocateString(char* str) {
     char* result = malloc(strlen(str) + 1);
@@ -32,4 +33,10 @@ int countCharOccurencesInStr(char c, char* str) {
         }
     }
     return result;
+}
+
+void waitForChild() {
+    int status = 0;
+    wait(&status);
+    handleChildStatus(status);
 }
