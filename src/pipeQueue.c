@@ -56,23 +56,8 @@ void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
     int readFD = childIdx == 0 ? STDIN_FILENO : pipes[2 * (childIdx - 1)];
     int writeFD =
         childIdx == pipeCount ? STDOUT_FILENO : pipes[2 * childIdx + 1];
-
     closePipesExcept(pipes, 2 * pipeCount, readFD, writeFD);
-
-    // replace stdin/stdout with pipes
-    int stdinCopy = safeDup(STDIN_FILENO);
-    int stdoutCopy = safeDup(STDOUT_FILENO);
-    if (readFD != STDIN_FILENO) {
-        safeDup2(readFD, STDIN_FILENO);
-    }
-    if (writeFD != STDOUT_FILENO) {
-        safeDup2(writeFD, STDOUT_FILENO);
-    }
-
-    runCommandsInQueue(command_head);
-
-    safeDup2(stdinCopy, STDIN_FILENO);
-    safeDup2(stdoutCopy, STDOUT_FILENO);
+    runCommandsInQueue(command_head, readFD, writeFD);
 }
 
 /*
@@ -111,7 +96,6 @@ void runPipesInQueue(pipe_head_t* head) {
         childIdx++;
     }
 
-    // last cmd must wait for all children-----------------------------
     runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
 
     while (childCount > 0) {

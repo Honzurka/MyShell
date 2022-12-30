@@ -31,6 +31,7 @@
                     "text": "handle SIGINT print nostop pass",
                     "ignoreFailures": false
                 }
+                // -exec set follow-fork-mode child // to debug forked child
             ],
             "preLaunchTask": "Build by make"
         }

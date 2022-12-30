@@ -216,11 +216,43 @@ void freeCommandQueue(command_head_t* head) {
     free(head);
 }
 
-void runCommandsInQueue(command_head_t* head) {
+int getCmdQueueSize(command_head_t* head) {
+    int result = 0;
+    command_node_t* iter;
+    STAILQ_FOREACH(iter, head, entries) { result++; }
+    return result;
+}
+
+void runCommandsInQueue(command_head_t* head, int readFD, int writeFD) {
+    int count = getCmdQueueSize(head);
+    int idx = 0;
+    int stdinCopy = -1;
+    int stdoutCopy = -1;
+
     command_node_t* iter;
     STAILQ_FOREACH(iter, head, entries) {
-        // printf("running command: %s\n", iter->data.command.name); //dbg
+        if (idx == 0) {
+            stdinCopy = safeDup(STDIN_FILENO);
+            if (readFD != STDIN_FILENO) {
+                safeDup2(readFD, STDIN_FILENO);
+            }
+        }
+        if (idx == count - 1) {
+            stdoutCopy = safeDup(STDOUT_FILENO);
+            if (writeFD != STDOUT_FILENO) {
+                safeDup2(writeFD, STDOUT_FILENO);
+            }
+        }
+
         runCommandWithRedirects(iter);
+
+        if (idx == 0) {
+            safeDup2(stdinCopy, STDIN_FILENO);
+        }
+        if (idx == count - 1) {
+            safeDup2(stdoutCopy, STDOUT_FILENO);
+        }
+        idx++;
     }
     // MAYBE TODO: free nested struct while freeing queue
     freeCommandQueue(head);
