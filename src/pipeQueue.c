@@ -51,6 +51,34 @@ void freePipeQueue(pipe_head_t* head) {
     free(head);
 }
 
+void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
+                        int pipeCount) {
+    int readFD = childIdx == 0 ? STDIN_FILENO : pipes[2 * (childIdx - 1)];
+    int writeFD =
+        childIdx == pipeCount ? STDOUT_FILENO : pipes[2 * childIdx + 1];
+
+    closeFDsExcept(pipes, 2 * pipeCount, readFD, writeFD);
+
+    // replace stdin/stdout with pipes
+    if (readFD != STDIN_FILENO) {
+        if (dup2(readFD, STDIN_FILENO) == -1) {
+            err(1, "%s", strerror(errno));
+        }
+        close(readFD);
+    }
+    if (writeFD != STDOUT_FILENO) {
+        if (dup2(writeFD, STDOUT_FILENO) == -1) {
+            err(1, "%s", strerror(errno));
+        }
+        close(writeFD);
+    }
+
+    runCommandsInQueue(command_head);
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+}
+
 void runPipesInQueue(pipe_head_t* head) {
     int childCount = getQueueSize(head);
     int pipeCount = childCount - 1;
@@ -68,54 +96,26 @@ void runPipesInQueue(pipe_head_t* head) {
     pipe_node_t* iter;
     STAILQ_FOREACH(iter, head, entries) {
         command_head_t* command_head = iter->data;
-        int readFD, writeFD;
         pid_t pid = fork();
         switch (pid) {
         case -1:   // error
             err(1, "%s", strerror(errno));
-        case 0:   // child
-            readFD = childIdx == 0 ? STDIN_FILENO : pipes[2 * (childIdx - 1)];
-            writeFD = childIdx == childCount - 1 ? STDOUT_FILENO
-                                                 : pipes[2 * childIdx + 1];
-
-            closeFDsExcept(pipes, 2 * pipeCount, readFD, writeFD);
-
-            // replace stdin/stdout with pipes
-            if (readFD != STDIN_FILENO) {
-                if (dup2(readFD, STDIN_FILENO) == -1) {
-                    err(1, "%s", strerror(errno));
-                }
-                close(readFD);
-            }
-            if (writeFD != STDOUT_FILENO) {
-                if (dup2(writeFD, STDOUT_FILENO) == -1) {
-                    err(1, "%s", strerror(errno));
-                }
-                close(writeFD);
-            }
-
-            runCommandsInQueue(command_head);
-
-            close(STDIN_FILENO);
-            close(STDOUT_FILENO);
+        case 0:
+            runCommandsByChild(childIdx, command_head, pipes, pipeCount);
             return;   // child execution ends here
-        default:      // parent
+        default:
             break;
         }
         childIdx++;
     }
 
-    // parent will close pipes
     for (int i = 0; i < pipeCount; i++) {
         close(pipes[2 * i]);
         close(pipes[2 * i + 1]);
     }
-
-    // parent will wait for all children
     while (childCount > 0) {
         waitForChild();
         childCount--;
     }
-
     freePipeQueue(head);
 }

@@ -210,7 +210,7 @@ void addCommandNode(command_head_t* head, command_node_t* node) {
     STAILQ_INSERT_TAIL(head, node, entries);
 }
 
-void freePipeQueue(command_head_t* head) {
+void freeCommandQueue(command_head_t* head) {
     command_node_t* iter = STAILQ_FIRST(head);
     while (iter != NULL) {
         command_node_t* next = STAILQ_NEXT(iter, entries);
@@ -227,5 +227,5 @@ void runCommandsInQueue(command_head_t* head) {
         runCommandWithRedirects(iter);
     }
     // MAYBE TODO: free nested struct while freeing queue
-    freePipeQueue(head);
+    freeCommandQueue(head);
 }
