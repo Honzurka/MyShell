@@ -95,7 +95,7 @@ void processScript(char** argv, int argvIdx) {
     char* fileName = argv[argvIdx];
     FILE* file = fopen(fileName, "r");
     if (file == NULL) {
-        err(UNKNOWN_COMMAND_ERR, "Unable to open script file: %s", fileName);
+        err(UNKNOWN_COMMAND_ERR, "Unable to open script file: %s\n", fileName);
     }
 
     char* line = NULL;
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
         processCommandString(argc, argv, argvIdx);
         break;
     default:
-        err(UNKNOWN_COMMAND_ERR, "Switch on unknown cmd source.");
+        err(UNKNOWN_COMMAND_ERR, "Switch on unknown cmd source\n");
     }
 
     return errorCode;

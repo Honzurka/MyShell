@@ -40,7 +40,7 @@ int countCharOccurencesInStr(char c, char* str) {
 void waitForChild() {
     int status = 0;
     if (wait(&status) == -1) {
-        err(1, "%s\n", strerror(errno));
+        err(1, "wait failed: %s\n", strerror(errno));
     }
     handleChildStatus(status);
 }
@@ -52,7 +52,7 @@ void waitForChild() {
 int safeDup(int fd) {
     int result = dup(fd);
     if (result == -1) {
-        err(1, "%s", strerror(errno));
+        err(1, "safeDup failed: %s\n", strerror(errno));
     }
     return result;
 }
@@ -63,7 +63,7 @@ int safeDup(int fd) {
  */
 void safeDup2(int oldfd, int newfd) {
     if (dup2(oldfd, newfd) == -1) {
-        err(1, "%s", strerror(errno));
+        err(1, "safeDup2 failed: %s\n", strerror(errno));
     }
     close(oldfd);
 }

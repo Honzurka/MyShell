@@ -71,7 +71,7 @@ void runPipesInQueue(pipe_head_t* head) {
     int pipes[2 * pipeCount];
     for (int i = 0; i < pipeCount; i++) {
         if (pipe(&pipes[2 * i]) == -1) {
-            err(1, "%s", strerror(errno));
+            err(1, "pipe creation failed: %s\n", strerror(errno));
         }
     }
 
@@ -86,7 +86,7 @@ void runPipesInQueue(pipe_head_t* head) {
         pid_t pid = fork();
         switch (pid) {
         case -1:   // error
-            err(1, "%s", strerror(errno));
+            err(1, "fork failed: %s\n", strerror(errno));
         case 0:
             runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
             _exit(0);
