@@ -1,17 +1,17 @@
-// %define api.value.type {char*}
-
-%{
+%code requires { // emitted to header file
     #include <stdio.h> //dbg
     #include <string.h>
     #include "parserFunctions.h"
     #include "globalError.h"
+}
 
+%code { // emitted source file
     int yylex();
     
     void yyerror(char *s);
     extern int yylineno;
     extern char* yytext;
-%}
+}
 
 %union {
     char* str;
@@ -70,7 +70,7 @@ command_list_req:
     | command_list_opt SEMIC command_with_redirects
     ;
 
-command_with_redirects:
+command_with_redirects: //TODO-NEXT: chain of commands with redirects------- linked-list vs ??? 
     redirect_list name redirect_list args redirect_list
     {
         // combine redirs - last one is most important
