@@ -100,8 +100,9 @@ void handleCommand(char* path, char* args) {
         err(1, "fork failed\n");
         break;
     case 0:   // child
-        execv(path, argArr);
-        break;
+        if (execv(path, argArr) == -1) {
+            _exit(UNKNOWN_COMMAND_ERROR);
+        }
     default:   // parent
         waitForChild();
         break;

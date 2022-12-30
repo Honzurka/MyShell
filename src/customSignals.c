@@ -28,8 +28,9 @@ void configureSignalHandling() {
         err(1, "Can't catch SIGINT\n");
     }
 
-    sa.sa_handler = SIG_IGN;
-    if (sigaction(SIGCHLD, &sa, NULL) != 0) {
-        err(1, "Can't catch SIGCHLD\n");
-    }
+    // --------v: breaks wait()
+    // sa.sa_handler = SIG_IGN;
+    // if (sigaction(SIGCHLD, &sa, NULL) != 0) {
+    //     err(1, "Can't catch SIGCHLD\n");
+    // }
 }

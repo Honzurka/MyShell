@@ -39,7 +39,9 @@ int countCharOccurencesInStr(char c, char* str) {
 
 void waitForChild() {
     int status = 0;
-    wait(&status);
+    if (wait(&status) == -1) {
+        err(1, "%s\n", strerror(errno));
+    }
     handleChildStatus(status);
 }
 
