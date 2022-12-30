@@ -1,11 +1,13 @@
 %code requires { // emitted to header file
-    #include <stdio.h> //dbg
-    #include <string.h>
     #include "parserFunctions.h"
-    #include "globalError.h"
+    #include "commandQueue.h"
 }
 
 %code { // emitted source file
+    #include <stdio.h> //dbg
+    #include <string.h>
+    #include "globalError.h"
+    
     int yylex();
     
     void yyerror(char *s);
@@ -17,6 +19,7 @@
     char* str;
     redirect_t redir;
     command_with_redirects_t cwr;
+    command_head_t* commandHead;
 }
 
 %token      LANGLE  "<"
@@ -29,11 +32,17 @@
 %type<str> name args
 %type<redir> redirect redirect_list
 %type<cwr> command_with_redirects
+%type<commandHead> command_list_req command_list_opt commands
 
 %%
 
 start:
-    pipe_list commands
+    pipe_list commands  {
+                            //TODO: handle pipe_list: add commands + run them all as separate children
+
+                            // for now: just run commands
+                            //...
+                        }
     ;
 
 pipe_list:
@@ -57,20 +66,32 @@ redirect:
     ;
 
 commands:
-    command_list_opt semic_opt
+    command_list_opt semic_opt  { $$ = $1; }
     ;
 
 command_list_opt:
-    %empty
-    | command_list_req
+    %empty              {
+                            command_head_t* head = createCommandHead();
+                            $$ = head;
+                        }
+    | command_list_req  { $$ = $1; }
     ;
 
 command_list_req:
-    command_with_redirects
-    | command_list_opt SEMIC command_with_redirects
+    command_with_redirects  {
+                                command_head_t* head = createCommandHead();
+                                command_node_t* node = createCommandNode($1);
+                                addCommandNode(head, node);
+                                $$ = head;
+                            }
+    | command_list_opt SEMIC command_with_redirects {
+                                                        command_node_t* node = createCommandNode($3);
+                                                        addCommandNode($1, node);
+                                                        $$ = $1;
+                                                    }
     ;
 
-command_with_redirects: //TODO-NEXT: chain of commands with redirects------- linked-list vs ??? 
+command_with_redirects:
     redirect_list name redirect_list args redirect_list
     {
         // combine redirs - last one is most important
@@ -78,13 +99,12 @@ command_with_redirects: //TODO-NEXT: chain of commands with redirects------- lin
         finalRedir = combineRedirects(finalRedir, $3);
         finalRedir = combineRedirects(finalRedir, $5);
 
-        // create command
-        command_t cmd = createCommand($2, $4); //will be run later
+        command_t cmd = createCommand($2, $4);
 
         $$ = createCommandWithRedirects(cmd, finalRedir);
 
-        // ...
-        runCommand($2, $4); //wont be directly executed with pipes------------------------instead it will be passed up to pipe chain
+        // ... should be run later------------------
+        runCommand($2, $4);
     }
     ;
 

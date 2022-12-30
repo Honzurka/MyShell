@@ -1,8 +1,6 @@
 #ifndef PARSER_FUNCTIONS_H
 #define PARSER_FUNCTIONS_H
 
-#include <sys/queue.h>
-
 typedef enum { INPUT, OUTPUT, APPEND } redirectType;
 
 typedef struct {
@@ -20,11 +18,6 @@ typedef struct {
     command_t command;
     redirect_t redirect;
 } command_with_redirects_t;
-
-// typedef struct command_node {
-//     command_with_redirects_t data;
-//     STAILQ_ENTRY(command_node) entries;
-// } command_node_t;
 
 char* concatArgs(char* str1, char* str2);
 void runCommand(char* name, char* args);
