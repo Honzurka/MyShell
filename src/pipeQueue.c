@@ -49,10 +49,7 @@ void runPipesInQueue(pipe_head_t* head) {
     int pipes[2 * pipeCount];
     for (int i = 0; i < pipeCount; i++) {
         if (pipe(&pipes[2 * i]) == -1) {
-            setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
-            return;   // TODO: these returns wont free
-                      // memory-----------------maybe use err instead =>
-                      // (non-recoverable)
+            err(1, "%s", strerror(errno));
         }
     }
 
@@ -65,8 +62,7 @@ void runPipesInQueue(pipe_head_t* head) {
         pid_t pid = fork();
         switch (pid) {
         case -1:   // error
-            setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
-            return;
+            err(1, "%s", strerror(errno));
         case 0:   // child
             readFD = childIdx == 0 ? STDIN_FILENO : pipes[2 * (childIdx - 1)];
             writeFD = childIdx == childCount - 1 ? STDOUT_FILENO
@@ -77,15 +73,13 @@ void runPipesInQueue(pipe_head_t* head) {
             // replace stdin/stdout with pipes
             if (readFD != STDIN_FILENO) {
                 if (dup2(readFD, STDIN_FILENO) == -1) {
-                    setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
-                    return;
+                    err(1, "%s", strerror(errno));
                 }
                 close(readFD);
             }
             if (writeFD != STDOUT_FILENO) {
                 if (dup2(writeFD, STDOUT_FILENO) == -1) {
-                    setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
-                    return;
+                    err(1, "%s", strerror(errno));
                 }
                 close(writeFD);
             }
