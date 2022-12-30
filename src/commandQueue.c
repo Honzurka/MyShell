@@ -2,13 +2,16 @@
 #include "customCommands.h"
 #include "helpers.h"
 #include "globalError.h"
+#include "parserFunctions.h"
 #include <stdlib.h>
 #include <stdio.h>   //dbg
 #include <err.h>
+#include <errno.h>
 #include <string.h>
 #include <libgen.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 /*
  * Creates argument array for execv
@@ -117,6 +120,9 @@ void handleCommand(char* path, char* args) {
     free(argArr);
 }
 
+/*
+ * frees command name and args
+ */
 void runCommand(command_t command) {
     char* path = command.name;
     char* args = command.args;
@@ -129,6 +135,69 @@ void runCommand(command_t command) {
         free(args);
     } else {
         handleCommand(path, args);
+    }
+}
+
+/*
+ * replaces STDIN/STDOUT with file
+ * returns copy of original FD or -1 on error
+ */
+int replaceFDByFile(int originalFD, char* filename, int oflag, mode_t mode) {
+    int originalFDCopy = dup(originalFD);
+    close(originalFD);
+
+    int fd = open(filename, oflag, mode);
+    if (fd == -1) {
+        setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
+        return -1;
+    } else if (fd != originalFD) {
+        setErrorWithAlloc(GENERAL_ERROR,
+                          "Failed to replace standard FD by file", 0);
+        return -1;
+    }
+
+    return originalFDCopy;
+}
+
+void replaceFileByFD(int originalFD, int originalFDCopy) {
+    // close(originalFD);   // maybe not needed------------------------------
+    if (dup2(originalFDCopy, originalFD) == -1) {
+        setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
+    }
+    close(originalFDCopy);
+}
+
+/*
+ * frees all nested strings
+ */
+void runCommandWithRedirects(command_node_t* node) {
+    redirect_t redirect = node->data.redirect;
+    int stdinCopy = 0;
+    int stdoutCopy = 0;
+
+    if (redirect.inFile != NULL) {
+        int oflag = O_RDONLY;
+        stdinCopy = replaceFDByFile(STDIN_FILENO, redirect.inFile, oflag, 0);
+    }
+    if (redirect.outFile != NULL) {
+        int appendFlag = redirect.append ? O_APPEND : O_TRUNC;
+        int oflag = O_WRONLY | appendFlag | O_CREAT;
+        stdoutCopy =
+            replaceFDByFile(STDOUT_FILENO, redirect.outFile, oflag, 0644);
+    }
+
+    if (stdinCopy == -1 || stdoutCopy == -1) {
+        return;
+    }
+    runCommand(node->data.command);
+
+    if (redirect.inFile != NULL) {
+        replaceFileByFD(STDIN_FILENO, stdinCopy);
+        free(redirect.inFile);
+    }
+    if (redirect.outFile != NULL) {
+        replaceFileByFD(STDOUT_FILENO, stdoutCopy);
+        free(redirect.outFile);
     }
 }
 
@@ -152,7 +221,9 @@ void runCommandsInQueue(command_head_t* head) {
     command_node_t* iter;
     STAILQ_FOREACH(iter, head, entries) {
         // printf("running command: %s\n", iter->data.command.name); //dbg
-        runCommand(iter->data.command);
-        // runCommandWithRedirects(node->data);
+        runCommandWithRedirects(iter);
     }
+
+    // MAYBE TODO: free nested struct while freeing queue
+    // TODO: free queue
 }
