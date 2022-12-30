@@ -31,7 +31,8 @@ redirect_t createRedirect(char* file, redirectType type) {
 
     switch (type) {
     case INPUT:
-        result.inFile = file;   // malloc?
+        result.inFile = file;
+        break;
     case OUTPUT:
         result.outFile = file;
         result.append = 0;
