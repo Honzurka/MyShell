@@ -41,6 +41,16 @@ void closeFDsExcept(int fds[], int fdsSize, int fd1, int fd2) {
     }
 }
 
+void freePipeQueue(pipe_head_t* head) {
+    pipe_node_t* iter = STAILQ_FIRST(head);
+    while (iter != NULL) {
+        pipe_node_t* next = STAILQ_NEXT(iter, entries);
+        free(iter);
+        iter = next;
+    }
+    free(head);
+}
+
 void runPipesInQueue(pipe_head_t* head) {
     int childCount = getQueueSize(head);
     int pipeCount = childCount - 1;
@@ -107,5 +117,5 @@ void runPipesInQueue(pipe_head_t* head) {
         childCount--;
     }
 
-    // TODO: free queue
+    freePipeQueue(head);
 }
