@@ -46,6 +46,7 @@ run-valgrind: all #maybe todo: run valgrind in tests
          --show-leak-kinds=all \
          --track-origins=yes \
          --log-file=valgrind.out \
+		 -s \
          ./mysh
 
 # Clean up

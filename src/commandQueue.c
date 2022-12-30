@@ -168,7 +168,7 @@ void replaceFileByFD(int originalFD, int originalFDCopy) {
 }
 
 /*
- * frees all nested strings
+ * frees all nested strings in node
  */
 void runCommandWithRedirects(command_node_t* node) {
     redirect_t redirect = node->data.redirect;
@@ -217,13 +217,23 @@ void addCommandNode(command_head_t* head, command_node_t* node) {
     STAILQ_INSERT_TAIL(head, node, entries);
 }
 
+void freeCommandQueue(command_head_t* head) {
+    command_node_t* iter = STAILQ_FIRST(head);
+    while (iter != NULL) {
+        command_node_t* next = STAILQ_NEXT(iter, entries);
+        free(iter);
+        iter = next;
+    }
+
+    free(head);
+}
+
 void runCommandsInQueue(command_head_t* head) {
     command_node_t* iter;
     STAILQ_FOREACH(iter, head, entries) {
         // printf("running command: %s\n", iter->data.command.name); //dbg
         runCommandWithRedirects(iter);
     }
-
     // MAYBE TODO: free nested struct while freeing queue
-    // TODO: free queue
+    freeCommandQueue(head);
 }
