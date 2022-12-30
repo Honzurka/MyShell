@@ -1,9 +1,11 @@
 #include "helpers.h"
 #include "globalError.h"
 #include <err.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 char* allocateString(char* str) {
     char* result = malloc(strlen(str) + 1);
@@ -39,4 +41,27 @@ void waitForChild() {
     int status = 0;
     wait(&status);
     handleChildStatus(status);
+}
+
+/*
+ * duplicates fd and returns it
+ * on error, prints error message and exits
+ */
+int safeDup(int fd) {
+    int result = dup(fd);
+    if (result == -1) {
+        err(1, "%s", strerror(errno));
+    }
+    return result;
+}
+
+/*
+ * puts oldfd into newfd
+ * on error, prints error message and exits
+ */
+void safeDup2(int oldfd, int newfd) {
+    if (dup2(oldfd, newfd) == -1) {
+        err(1, "%s", strerror(errno));
+    }
+    close(oldfd);
 }

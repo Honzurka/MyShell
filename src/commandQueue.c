@@ -153,11 +153,7 @@ int replaceFDByFile(int originalFD, char* filename, int oflag, mode_t mode) {
 }
 
 void replaceFileByFD(int originalFD, int originalFDCopy) {
-    // close(originalFD);   // maybe not needed------------------------------
-    if (dup2(originalFDCopy, originalFD) == -1) {
-        setErrorWithAlloc(GENERAL_ERROR, strerror(errno), 0);
-    }
-    close(originalFDCopy);
+    safeDup2(originalFDCopy, originalFD);
 }
 
 /*

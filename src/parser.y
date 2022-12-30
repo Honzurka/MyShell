@@ -44,7 +44,6 @@ start:
                             pipe_node_t* node = createPipeNode($2);
                             addPipeNode($1, node);
                             runPipesInQueue($1);
-                            // runCommandsInQueue($2); //remove this<--------
                         }
     ;
 

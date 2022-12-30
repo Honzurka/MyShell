@@ -60,28 +60,27 @@ void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
     closeFDsExcept(pipes, 2 * pipeCount, readFD, writeFD);
 
     // replace stdin/stdout with pipes
+    int stdinCopy = safeDup(STDIN_FILENO);
+    int stdoutCopy = safeDup(STDOUT_FILENO);
     if (readFD != STDIN_FILENO) {
-        if (dup2(readFD, STDIN_FILENO) == -1) {
-            err(1, "%s", strerror(errno));
-        }
-        close(readFD);
+        safeDup2(readFD, STDIN_FILENO);
     }
     if (writeFD != STDOUT_FILENO) {
-        if (dup2(writeFD, STDOUT_FILENO) == -1) {
-            err(1, "%s", strerror(errno));
-        }
-        close(writeFD);
+        safeDup2(writeFD, STDOUT_FILENO);
     }
 
     runCommandsInQueue(command_head);
 
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
+    safeDup2(stdinCopy, STDIN_FILENO);
+    safeDup2(stdoutCopy, STDOUT_FILENO);
 }
 
+/*
+ * Runs all piped commands from queue except last command which is run by parent
+ */
 void runPipesInQueue(pipe_head_t* head) {
-    int childCount = getQueueSize(head);
-    int pipeCount = childCount - 1;
+    int pipeCount = getQueueSize(head) - 1;
+    int childCount = pipeCount;
 
     // create pipes
     int pipes[2 * pipeCount];
@@ -95,13 +94,16 @@ void runPipesInQueue(pipe_head_t* head) {
     int childIdx = 0;
     pipe_node_t* iter;
     STAILQ_FOREACH(iter, head, entries) {
-        command_head_t* command_head = iter->data;
+        if (childIdx == childCount) {
+            break;
+        }
+
         pid_t pid = fork();
         switch (pid) {
         case -1:   // error
             err(1, "%s", strerror(errno));
         case 0:
-            runCommandsByChild(childIdx, command_head, pipes, pipeCount);
+            runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
             return;   // child execution ends here
         default:
             break;
@@ -109,10 +111,8 @@ void runPipesInQueue(pipe_head_t* head) {
         childIdx++;
     }
 
-    for (int i = 0; i < pipeCount; i++) {
-        close(pipes[2 * i]);
-        close(pipes[2 * i + 1]);
-    }
+    runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
+
     while (childCount > 0) {
         waitForChild();
         childCount--;
