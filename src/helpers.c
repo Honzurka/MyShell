@@ -23,3 +23,13 @@ int getArgCount(char** str) {
     }
     return result;
 }
+
+int countCharOccurencesInStr(char c, char* str) {
+    int result = 0;
+    for (char* str_p = str; *str_p != '\0'; str_p++) {
+        if (*str_p == c) {
+            result++;
+        }
+    }
+    return result;
+}

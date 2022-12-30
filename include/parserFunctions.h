@@ -20,7 +20,6 @@ typedef struct {
 } command_with_redirects_t;
 
 char* concatArgs(char* str1, char* str2);
-void runCommand(char* name, char* args);
 redirect_t createRedirect(char* file, redirectType type);
 redirect_t combineRedirects(redirect_t this, redirect_t other);
 command_t createCommand(char* name, char* args);

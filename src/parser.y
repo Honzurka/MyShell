@@ -41,7 +41,7 @@ start:
                             //TODO: handle pipe_list: add commands + run them all as separate children
 
                             // for now: just run commands
-                            //...
+                            runCommandsInQueue($2);
                         }
     ;
 
@@ -102,9 +102,6 @@ command_with_redirects:
         command_t cmd = createCommand($2, $4);
 
         $$ = createCommandWithRedirects(cmd, finalRedir);
-
-        // ... should be run later------------------
-        runCommand($2, $4);
     }
     ;
 
