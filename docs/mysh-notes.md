@@ -48,7 +48,7 @@
 - pipes <----------- use linked list to represent commands (after that cascade-free whole list)
     - shell is parent of all processes
     - shell waits for all commands in pipeline to finish before next prompt
-- redirections
+- **DONE** redirections
     - only std `>(out, truncate),<(in),>>(out, append)`
     - anywhere on line
         - (if multiple: `> & >>`)   last one is applied

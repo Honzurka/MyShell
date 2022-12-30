@@ -77,7 +77,7 @@ char* findProgramInPATH(char* progName) {
 }
 
 void waitForChild() {
-    int status;
+    int status = 0;
     wait(&status);
     handleChildStatus(status);
 }

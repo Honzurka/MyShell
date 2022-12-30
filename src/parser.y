@@ -1,6 +1,7 @@
 %code requires { // emitted to header file
     #include "parserFunctions.h"
     #include "commandQueue.h"
+    #include "pipeQueue.h"
 }
 
 %code { // emitted source file
@@ -20,6 +21,7 @@
     redirect_t redir;
     command_with_redirects_t cwr;
     command_head_t* commandHead;
+    pipe_head_t* pipeHead;
 }
 
 %token      LANGLE  "<"
@@ -33,22 +35,32 @@
 %type<redir> redirect redirect_list
 %type<cwr> command_with_redirects
 %type<commandHead> command_list_req command_list_opt commands
+%type<pipeHead> pipe_list
 
 %%
 
 start:
     pipe_list commands  {
-                            //TODO: handle pipe_list: add commands + run them all as separate children
-
-                            // for now: just run commands
-                            runCommandsInQueue($2);
+                            pipe_node_t* node = createPipeNode($2);
+                            addPipeNode($1, node);
+                            runPipesInQueue($1);
+                            // runCommandsInQueue($2); //remove this<--------
                         }
     ;
 
 pipe_list:
-    %empty
-    | command_list_req PIPE
-    | pipe_list command_list_req PIPE
+    %empty                              { $$ = createPipeHead(); }
+    | command_list_req PIPE             {
+                                            pipe_head_t* head = createPipeHead();
+                                            pipe_node_t* node = createPipeNode($1);
+                                            addPipeNode(head, node);
+                                            $$ = head;
+                                        }
+    | pipe_list command_list_req PIPE   {
+                                            pipe_node_t* node = createPipeNode($2);
+                                            addPipeNode($1, node);
+                                            $$ = $1;
+                                        }
     ;
 
 redirect_list:
@@ -70,10 +82,7 @@ commands:
     ;
 
 command_list_opt:
-    %empty              {
-                            command_head_t* head = createCommandHead();
-                            $$ = head;
-                        }
+    %empty              { $$ = createCommandHead(); }
     | command_list_req  { $$ = $1; }
     ;
 
