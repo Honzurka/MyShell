@@ -32,12 +32,12 @@ int getQueueSize(pipe_head_t* head) {
     return result;
 }
 
-void closeFDsExcept(int fds[], int fdsSize, int fd1, int fd2) {
-    for (int i = 0; i < fdsSize; i++) {
-        if (fds[i] == fd1 || fds[i] == fd2) {
+void closePipesExcept(int pipes[], int pipesSize, int fd1, int fd2) {
+    for (int i = 0; i < pipesSize; i++) {
+        if (pipes[i] == fd1 || pipes[i] == fd2) {
             continue;
         }
-        close(fds[i]);
+        close(pipes[i]);
     }
 }
 
@@ -57,7 +57,7 @@ void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
     int writeFD =
         childIdx == pipeCount ? STDOUT_FILENO : pipes[2 * childIdx + 1];
 
-    closeFDsExcept(pipes, 2 * pipeCount, readFD, writeFD);
+    closePipesExcept(pipes, 2 * pipeCount, readFD, writeFD);
 
     // replace stdin/stdout with pipes
     int stdinCopy = safeDup(STDIN_FILENO);
@@ -104,18 +104,20 @@ void runPipesInQueue(pipe_head_t* head) {
             err(1, "%s", strerror(errno));
         case 0:
             runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
-            return;   // child execution ends here
+            _exit(0);
         default:
             break;
         }
         childIdx++;
     }
 
+    // last cmd must wait for all children-----------------------------
     runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
 
     while (childCount > 0) {
         waitForChild();
         childCount--;
     }
+
     freePipeQueue(head);
 }
