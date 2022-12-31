@@ -137,9 +137,7 @@ void runCommand(command_t command) {
  */
 int replaceFDByFile(int originalFD, char* filename, int oflag, mode_t mode) {
     int originalFDCopy = dup(originalFD);
-    if (close(originalFD) == -1) {
-        err(1, "closing fd failed%s\n", strerror(errno));
-    }
+    safeClose(originalFD, "closing fd failed");
 
     int fd = open(filename, oflag, mode);
     if (fd == -1) {

@@ -75,7 +75,11 @@ void safeDup2(int oldfd, int newfd) {
     if (dup2(oldfd, newfd) == -1) {
         err(1, "safeDup2 failed: %s\n", strerror(errno));
     }
-    if (close(oldfd) == -1) {
-        err(1, "safeDup2 close failed%s\n", strerror(errno));
+    safeClose(oldfd, "safeDup2 close failed");
+}
+
+void safeClose(int fd, char* errorMessage) {
+    if (close(fd) == -1) {
+        err(1, "%s: %s\n", errorMessage, strerror(errno));
     }
 }

@@ -32,17 +32,6 @@ int getQueueSize(pipe_head_t* head) {
     return result;
 }
 
-void closePipesExcept(int pipes[], int pipesSize, int fd1, int fd2) {
-    for (int i = 0; i < pipesSize; i++) {
-        if (pipes[i] == fd1 || pipes[i] == fd2) {
-            continue;
-        }
-        if (close(pipes[i]) == -1) {
-            err(1, "closing pipe failed%s\n", strerror(errno));
-        }
-    }
-}
-
 void freePipeQueue(pipe_head_t* head) {
     pipe_node_t* iter = STAILQ_FIRST(head);
     while (iter != NULL) {
@@ -53,12 +42,7 @@ void freePipeQueue(pipe_head_t* head) {
     free(head);
 }
 
-void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
-                        int pipeCount) {
-    int readFD = childIdx == 0 ? STDIN_FILENO : pipes[2 * (childIdx - 1)];
-    int writeFD =
-        childIdx == pipeCount ? STDOUT_FILENO : pipes[2 * childIdx + 1];
-    closePipesExcept(pipes, 2 * pipeCount, readFD, writeFD);
+void runCommandsByChild(command_head_t* command_head, int readFD, int writeFD) {
     runCommandsInQueue(command_head, readFD, writeFD);
 }
 
@@ -66,16 +50,10 @@ void runCommandsByChild(int childIdx, command_head_t* command_head, int pipes[],
  * Runs all piped commands from queue except last command which is run by parent
  */
 void runPipesInQueue(pipe_head_t* head) {
-    int pipeCount = getQueueSize(head) - 1;
-    int childCount = pipeCount;
+    int childCount = getQueueSize(head) - 1;
 
-    // create pipes
-    int pipes[2 * pipeCount];
-    for (int i = 0; i < pipeCount; i++) {
-        if (pipe(&pipes[2 * i]) == -1) {
-            err(1, "pipe creation failed: %s\n", strerror(errno));
-        }
-    }
+    int oldPipeFD[2] = {STDIN_FILENO, STDOUT_FILENO};
+    int pipeFD[2] = {-1, -1};
 
     // create child processes
     int childIdx = 0;
@@ -85,20 +63,46 @@ void runPipesInQueue(pipe_head_t* head) {
             break;
         }
 
+        // create pipe
+        if (pipe(pipeFD) == -1) {
+            err(1, "pipe creation failed: %s\n", strerror(errno));
+        }
+
         pid_t pid = fork();
         switch (pid) {
         case -1:   // error
             err(1, "fork failed: %s\n", strerror(errno));
         case 0:
-            runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
+            if (pipeFD[0] != STDIN_FILENO) {
+                safeClose(pipeFD[0], "closing pipe failed");
+            }
+            if (oldPipeFD[1] != STDOUT_FILENO) {
+                safeClose(oldPipeFD[1], "closing pipe failed");
+            }
+            runCommandsByChild(iter->data, oldPipeFD[0], pipeFD[1]);
             _exit(0);
         default:
             break;
         }
+
+        // reassign pipe
+        if (oldPipeFD[0] != STDIN_FILENO) {
+            safeClose(oldPipeFD[0], "closing pipe failed");
+        }
+        if (oldPipeFD[1] != STDOUT_FILENO) {
+            safeClose(oldPipeFD[1], "closing pipe failed");
+        }
+        oldPipeFD[0] = pipeFD[0];
+        oldPipeFD[1] = pipeFD[1];
+
         childIdx++;
     }
 
-    runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
+    if (oldPipeFD[1] != STDOUT_FILENO) {
+        // MAYBE TODO: create wrapper function for these check+close-----------
+        safeClose(oldPipeFD[1], "closing pipe failed");
+    }
+    runCommandsByChild(iter->data, oldPipeFD[0], STDOUT_FILENO);
 
     while (childCount > 0) {
         waitForChild(-1);
