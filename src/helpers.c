@@ -40,9 +40,14 @@ int countCharOccurencesInStr(char c, char* str) {
 void waitForChild() {
     int status = 0;
     if (wait(&status) == -1) {
-        err(1, "wait failed: %s\n", strerror(errno));
+        if (errno == EINTR) {
+            setErrorWithAlloc(SIGNAL_BASE + SIGINT, "wait interrupted", 0);
+        } else {
+            err(1, "wait failed: %s\n", strerror(errno));
+        }
+    } else {
+        handleChildStatus(status);
     }
-    handleChildStatus(status);
 }
 
 /*

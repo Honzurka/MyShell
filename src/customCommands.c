@@ -25,6 +25,9 @@ int getCustomCommandID(char* command) {
     return -1;
 }
 
+/*
+ * handlers must reset error before calling command (due to custom exit command)
+ */
 void handleCustomCommand(int commandID, char** args) {
     customHandlers[commandID](args);
     free(args);
@@ -37,6 +40,7 @@ void handleExit(char** args) {
 }
 
 void handleCd(char** args) {
+    resetError();
     int argCount = getArgCount(args);
     if (argCount > 2) {
         setErrorWithAlloc(GENERAL_ERROR, "cd: too many arguments", 0);

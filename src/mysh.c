@@ -49,8 +49,6 @@ commandSource_t getSource(int argc, char** argv, int* argStartIdx) {
 }
 
 void processLine(char* line) {
-    resetError();
-
     YY_BUFFER_STATE buf = yy_scan_string(line);
     yyparse();   // error code is handled through globalError
     yy_delete_buffer(buf);

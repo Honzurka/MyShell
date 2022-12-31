@@ -128,6 +128,7 @@ void runCommand(command_t command) {
         free(path);
         free(args);
     } else {
+        resetError();
         handleCommand(path, args);
     }
 }

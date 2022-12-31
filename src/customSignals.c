@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdio.h>   //dbg
 #include <readline/readline.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 void sigintHandler(int signum) {
@@ -18,6 +19,11 @@ void sigintHandler(int signum) {
     rl_redisplay();
 }
 
+/*
+ * ignores SIGCHLD without SIG_IGN => allows reading exit value after wait()
+ */
+void sigchldHandler(int signum) { (void)signum; }
+
 void configureSignalHandling() {
     struct sigaction sa;
     sigemptyset(&sa.sa_mask);
@@ -28,9 +34,8 @@ void configureSignalHandling() {
         err(1, "Can't catch SIGINT\n");
     }
 
-    // --------v: breaks wait()
-    // sa.sa_handler = SIG_IGN;
-    // if (sigaction(SIGCHLD, &sa, NULL) != 0) {
-    //     err(1, "Can't catch SIGCHLD\n");
-    // }
+    sa.sa_handler = sigchldHandler;
+    if (sigaction(SIGCHLD, &sa, NULL) != 0) {
+        err(1, "Can't catch SIGCHLD\n");
+    }
 }
