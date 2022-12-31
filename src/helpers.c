@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <stdio.h>   //dbg
+// #include <stdio.h>   //dbg
 
 char* allocateString(char* str) {
     char* result = malloc(strlen(str) + 1);
@@ -43,7 +43,7 @@ int countCharOccurencesInStr(char c, char* str) {
  */
 void waitForChild(int childPid) {
     int status = 0;
-    int pid = waitpid(childPid, &status, 0);   // dbg
+    int pid = waitpid(childPid, &status, 0);
     if (pid == -1) {
         if (errno == EINTR) {
             setErrorWithAlloc(SIGNAL_BASE + SIGINT, "wait interrupted", 0);
@@ -75,5 +75,7 @@ void safeDup2(int oldfd, int newfd) {
     if (dup2(oldfd, newfd) == -1) {
         err(1, "safeDup2 failed: %s\n", strerror(errno));
     }
-    close(oldfd);
+    if (close(oldfd) == -1) {
+        err(1, "safeDup2 close failed%s\n", strerror(errno));
+    }
 }

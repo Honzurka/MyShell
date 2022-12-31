@@ -37,7 +37,9 @@ void closePipesExcept(int pipes[], int pipesSize, int fd1, int fd2) {
         if (pipes[i] == fd1 || pipes[i] == fd2) {
             continue;
         }
-        close(pipes[i]);
+        if (close(pipes[i]) == -1) {
+            err(1, "closing pipe failed%s\n", strerror(errno));
+        }
     }
 }
 

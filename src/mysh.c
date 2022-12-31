@@ -8,6 +8,7 @@
 #include "globalError.h"
 #include <dirent.h>
 #include <err.h>
+#include <errno.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,7 +109,9 @@ void processScript(char** argv, int argvIdx) {
     }
 
     free(line);
-    fclose(file);
+    if (fclose(file) != 0) {
+        err(1, "Unable to close script file: %s\n", strerror(errno));
+    }
 }
 
 void processCommandString(int argc, char** argv, int argvIdx) {
