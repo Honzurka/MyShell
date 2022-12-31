@@ -51,7 +51,6 @@ void runCommandsByChild(command_head_t* command_head, int readFD, int writeFD) {
  */
 void runPipesInQueue(pipe_head_t* head) {
     int childCount = getQueueSize(head) - 1;
-
     int oldPipeFD[2] = {STDIN_FILENO, STDOUT_FILENO};
     int pipeFD[2] = {-1, -1};
 
@@ -63,7 +62,6 @@ void runPipesInQueue(pipe_head_t* head) {
             break;
         }
 
-        // create pipe
         if (pipe(pipeFD) == -1) {
             err(1, "pipe creation failed: %s\n", strerror(errno));
         }
@@ -73,35 +71,22 @@ void runPipesInQueue(pipe_head_t* head) {
         case -1:   // error
             err(1, "fork failed: %s\n", strerror(errno));
         case 0:
-            if (pipeFD[0] != STDIN_FILENO) {
-                safeClose(pipeFD[0], "closing pipe failed");
-            }
-            if (oldPipeFD[1] != STDOUT_FILENO) {
-                safeClose(oldPipeFD[1], "closing pipe failed");
-            }
+            safeCloseUnlessStandard(pipeFD[0], "closing pipe failed");
+            safeCloseUnlessStandard(oldPipeFD[1], "closing pipe failed");
             runCommandsByChild(iter->data, oldPipeFD[0], pipeFD[1]);
             _exit(0);
         default:
             break;
         }
 
-        // reassign pipe
-        if (oldPipeFD[0] != STDIN_FILENO) {
-            safeClose(oldPipeFD[0], "closing pipe failed");
-        }
-        if (oldPipeFD[1] != STDOUT_FILENO) {
-            safeClose(oldPipeFD[1], "closing pipe failed");
-        }
+        safeCloseUnlessStandard(oldPipeFD[0], "closing pipe failed");
+        safeCloseUnlessStandard(oldPipeFD[1], "closing pipe failed");
         oldPipeFD[0] = pipeFD[0];
         oldPipeFD[1] = pipeFD[1];
-
         childIdx++;
     }
 
-    if (oldPipeFD[1] != STDOUT_FILENO) {
-        // MAYBE TODO: create wrapper function for these check+close-----------
-        safeClose(oldPipeFD[1], "closing pipe failed");
-    }
+    safeCloseUnlessStandard(oldPipeFD[1], "closing pipe failed");
     runCommandsByChild(iter->data, oldPipeFD[0], STDOUT_FILENO);
 
     while (childCount > 0) {

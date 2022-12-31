@@ -83,3 +83,9 @@ void safeClose(int fd, char* errorMessage) {
         err(1, "%s: %s\n", errorMessage, strerror(errno));
     }
 }
+
+void safeCloseUnlessStandard(int fd, char* errorMessage) {
+    if (fd != STDIN_FILENO && fd != STDOUT_FILENO) {
+        safeClose(fd, errorMessage);
+    }
+}

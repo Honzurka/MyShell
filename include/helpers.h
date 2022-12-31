@@ -8,5 +8,6 @@ void waitForChild(int pid);
 int safeDup(int fd);
 void safeDup2(int oldfd, int newfd);
 void safeClose(int fd, char* errorMessage);
+void safeCloseUnlessStandard(int fd, char* errorMessage);
 
 #endif
