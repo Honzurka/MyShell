@@ -76,8 +76,6 @@ char* findProgramInPATH(char* progName) {
 }
 
 void handleCommand(char* path, char* args) {
-    // printf("dbg: running command: %s with args %s\n", path, args);
-
     char* pathCopy = strdup(path);
     if (pathCopy == NULL) {
         err(1, "strdup failed\n");
@@ -104,7 +102,7 @@ void handleCommand(char* path, char* args) {
             _exit(UNKNOWN_COMMAND_ERROR);
         }
     default:   // parent
-        waitForChild();
+        waitForChild(pid);
         break;
     }
 

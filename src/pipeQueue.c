@@ -99,7 +99,7 @@ void runPipesInQueue(pipe_head_t* head) {
     runCommandsByChild(childIdx, iter->data, pipes, pipeCount);
 
     while (childCount > 0) {
-        waitForChild();
+        waitForChild(-1);
         childCount--;
     }
 

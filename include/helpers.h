@@ -4,7 +4,7 @@
 char* allocateString(char* str);
 int getArgCount(char** str);
 int countCharOccurencesInStr(char c, char* str);
-void waitForChild();
+void waitForChild(int pid);
 int safeDup(int fd);
 void safeDup2(int oldfd, int newfd);
 

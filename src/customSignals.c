@@ -35,6 +35,8 @@ void configureSignalHandling() {
     }
 
     sa.sa_handler = sigchldHandler;
+    sa.sa_flags =
+        SA_RESTART;   // required to avoid `error: Interrupted system call`
     if (sigaction(SIGCHLD, &sa, NULL) != 0) {
         err(1, "Can't catch SIGCHLD\n");
     }
