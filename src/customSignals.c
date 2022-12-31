@@ -2,7 +2,7 @@
 #include <err.h>
 #include <setjmp.h>
 #include <signal.h>
-#include <stdio.h>   //dbg
+#include <stdio.h>
 #include <readline/readline.h>
 #include <stdlib.h>
 #include <unistd.h>

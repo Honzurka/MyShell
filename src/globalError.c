@@ -48,7 +48,6 @@ void reportError() {
 }
 
 void handleChildStatus(int status) {
-    // MAYBE TODO: fix line numbers --- probably has to be done in parser -----
     if (WIFEXITED(status)) {
         setErrorWithAlloc(WEXITSTATUS(status), "Child process exited", 0);
     }

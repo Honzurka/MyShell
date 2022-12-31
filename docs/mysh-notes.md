@@ -45,7 +45,7 @@
 - **DONE** `cwd in prompt`
 
 ## Phase 2
-- pipes <----------- use linked list to represent commands (after that cascade-free whole list)
+- **DONE** pipes <----------- use linked list to represent commands (after that cascade-free whole list)
     - shell is parent of all processes
     - shell waits for all commands in pipeline to finish before next prompt
 - **DONE** redirections

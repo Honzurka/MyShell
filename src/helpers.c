@@ -6,7 +6,6 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-// #include <stdio.h>   //dbg
 
 char* allocateString(char* str) {
     char* result = malloc(strlen(str) + 1);
