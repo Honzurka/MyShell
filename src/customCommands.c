@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pwd.h>
 
 typedef void (*CommandHandler)(char** args);
 CommandHandler customHandlers[] = {handleExit, handleCd};
@@ -51,8 +52,16 @@ void handleCd(char** args) {
     {
         dir = getenv("HOME");
         if (dir == NULL) {
-            setErrorWithAlloc(GENERAL_ERROR, "HOME not set", 0);
-            return;
+            setErrorWithAlloc(JUST_WARNING, "HOME not set", 0);
+            struct passwd* pwd = getpwuid(getuid());
+            if (pwd != NULL) {
+                dir = pwd->pw_dir;
+            } else {
+                setErrorWithAlloc(
+                    GENERAL_ERROR,
+                    "HOME not set and unable to get home dir from getpwuid", 0);
+                return;
+            }
         }
     } else if (strcmp(dir, "-") == 0)   // arg is '-'
     {
@@ -73,7 +82,7 @@ void handleCd(char** args) {
     int replaceOLDPWD = 1;
     char* cwd = getenv("PWD");
     if (cwd == NULL) {
-        setErrorWithAlloc(GENERAL_ERROR, "PWD not set", 0);
+        setErrorWithAlloc(JUST_WARNING, "PWD not set", 0);
         cwd = "";
         replaceOLDPWD = 0;
     }

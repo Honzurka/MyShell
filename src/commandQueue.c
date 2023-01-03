@@ -11,6 +11,7 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "commandsWithoutPath.h"
 
 /*
  * Creates argument array for execv
@@ -52,7 +53,8 @@ char* findProgramInPATH(char* progName) {
 
     char* path = getenv("PATH");
     if (path == NULL) {
-        err(1, "PATH not set\n");
+        fprintf(stderr, "PATH not set\n");
+        return NULL;
     }
 
     char* pathCopy = strdup(path);
@@ -82,16 +84,19 @@ void handleCommand(char* path, char* args) {
     }
 
     char* name = basename(pathCopy);
+    char** argArr = createArgArray(name, args);
+
     if (strcmp(path, name) == 0) {
         free(path);
         path = findProgramInPATH(name);
     }
     if (path == NULL) {
-        setErrorWithAlloc(UNKNOWN_COMMAND_ERROR, "command not found...", 0);
-        return;
+        if (tryExecutionWithoutPath(name, argArr) == 0) {
+            setErrorWithAlloc(UNKNOWN_COMMAND_ERROR, "command not found...", 0);
+        }
+        goto cleanup;
     }
 
-    char** argArr = createArgArray(name, args);
     pid_t pid = fork();
     switch (pid) {
     case -1:
@@ -106,6 +111,7 @@ void handleCommand(char* path, char* args) {
         break;
     }
 
+cleanup:
     free(path);
     free(pathCopy);
     free(args);
