@@ -35,7 +35,7 @@ $(EXE): $(OBJS)
 
 # Compile bison files
 %.tab.c %.tab.h: %.y
-	$(BISON) --header=$*.tab.h -o $*.tab.c $<
+	$(BISON) --header=$*.tab.h --warnings=all -Wcounterexamples -o $*.tab.c $<
 
 # Compile flex files
 %.yy.c %.h: %.l

@@ -49,12 +49,6 @@ start:
 
 pipe_list:
     %empty                              { $$ = createPipeHead(); }
-    | command_list_req PIPE             {
-                                            pipe_head_t* head = createPipeHead();
-                                            pipe_node_t* node = createPipeNode($1);
-                                            addPipeNode(head, node);
-                                            $$ = head;
-                                        }
     | pipe_list command_list_req PIPE   {
                                             pipe_node_t* node = createPipeNode($2);
                                             addPipeNode($1, node);
@@ -100,7 +94,16 @@ command_list_req:
     ;
 
 command_with_redirects:
-    redirect_list name redirect_list args redirect_list
+    redirect_list name redirect_list
+    {
+        redirect_t finalRedir = $1;
+        finalRedir = combineRedirects(finalRedir, $3);
+
+        command_t cmd = createCommand($2, NULL); // NULL args
+
+        $$ = createCommandWithRedirects(cmd, finalRedir);
+    }
+    | redirect_list name redirect_list args redirect_list
     {
         // combine redirs - last one is most important
         redirect_t finalRedir = $1;
@@ -118,19 +121,8 @@ name:
     ;
 
 args:
-    %empty      {
-                    $$ = NULL;
-                }
-    | args STR  {
-                    if ($1 == NULL)
-                    {
-                        $$ = $2;
-                    }
-                    else
-                    {
-                        $$ = concatArgs($1, $2); // maybe todo: could be improved with types
-                    }
-                }
+    STR         { $$ = $1; }
+    | args STR  { $$ = concatArgs($1, $2); }
     ;
 
 semic_opt:
