@@ -213,6 +213,7 @@ void addCommandNode(command_head_t* head, command_node_t* node) {
 }
 
 void freeCommandQueue(command_head_t* head) {
+    // printf("free command queue called\n");
     command_node_t* iter = STAILQ_FIRST(head);
     while (iter != NULL) {
         command_node_t* next = STAILQ_NEXT(iter, entries);
@@ -260,6 +261,5 @@ void runCommandsInQueue(command_head_t* head, int readFD, int writeFD) {
         }
         idx++;
     }
-    // MAYBE TODO: free nested struct while freeing queue
     freeCommandQueue(head);
 }

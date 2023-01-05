@@ -7,8 +7,9 @@
 - [x] create makefile
     - -Wall, -Wextra 
 - [x] check c-style
-- [ ] test on lab machine
+- [x] test on lab machine
 - [ ] checks with valgrind
+- [ ] read extraFeedback + web <--------------------------
 
 ## Implementation
 - `readline` to get input

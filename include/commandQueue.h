@@ -15,5 +15,6 @@ command_head_t* createCommandHead();
 command_node_t* createCommandNode(command_with_redirects_t data);
 void addCommandNode(command_head_t* head, command_node_t* node);
 void runCommandsInQueue(command_head_t* head, int readFD, int writeFD);
+void freeCommandQueue(command_head_t* head);
 
 #endif

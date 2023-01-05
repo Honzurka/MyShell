@@ -83,6 +83,8 @@ void runPipesInQueue(pipe_head_t* head) {
         oldPipeFD[0] = pipeFD[0];
         oldPipeFD[1] = pipeFD[1];
         childIdx++;
+
+        freeCommandQueue(iter->data);
     }
 
     safeCloseUnlessStandard(oldPipeFD[1], "closing pipe failed");

@@ -41,13 +41,21 @@ $(EXE): $(OBJS)
 %.yy.c %.h: %.l
 	$(FLEX) -o $@ --header-file=$*.h $<
 
-run-valgrind: all #maybe todo: run valgrind in tests
+run-valgrind: all
 	valgrind --leak-check=full \
          --show-leak-kinds=all \
          --track-origins=yes \
-         --log-file=valgrind.out \
+         --log-file=tests/valgrind/test1-valgrind.out \
 		 -s \
-         ./mysh
+         ./mysh tests/valgrind/test1.sh > /dev/null
+# valgrind --leak-check=full \
+# --show-leak-kinds=all \
+# --track-origins=yes \
+# --log-file=tests/valgrind/test2-valgrind.out \
+# -s \
+env - ./mysh tests/valgrind/test2.sh > /dev/null > /dev/null
+# test2 doesnt work?--------------------------TODO: fix
+	
 
 # Clean up
 clean:
