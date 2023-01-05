@@ -42,6 +42,6 @@
                     return STR;
                 }
 
-.   { fprintf(stderr, "unknown char: %s\n", yytext); }
+    /*.   { fprintf(stderr, "unknown char: %s\n", yytext); } --- rule not matched */
 
 %%
