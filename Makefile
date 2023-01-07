@@ -48,14 +48,6 @@ run-valgrind: all
          --log-file=tests/valgrind/test1-valgrind.out \
 		 -s \
          ./mysh tests/valgrind/test1.sh > /dev/null
-# valgrind --leak-check=full \
-# --show-leak-kinds=all \
-# --track-origins=yes \
-# --log-file=tests/valgrind/test2-valgrind.out \
-# -s \
-env - ./mysh tests/valgrind/test2.sh > /dev/null > /dev/null
-# test2 doesnt work?--------------------------TODO: fix
-	
 
 # Clean up
 clean:
