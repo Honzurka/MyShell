@@ -25,5 +25,6 @@ redirect_t combineRedirects(redirect_t this, redirect_t other);
 command_t createCommand(char* name, char* args);
 command_with_redirects_t createCommandWithRedirects(command_t command,
                                                     redirect_t redirect);
+void freeCommandWithRedirects(command_with_redirects_t command);
 
 #endif

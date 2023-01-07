@@ -1,6 +1,6 @@
 # echo x
 # echo x; echo y; #comment
-echo x | cat
+echo xolo | cat
 # echo X | cat | cat | cat | sort
 
 # cd /tmp

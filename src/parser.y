@@ -95,25 +95,25 @@ command_list_req:
 
 command_with_redirects:
     redirect_list name redirect_list
-    {
-        redirect_t finalRedir = $1;
-        finalRedir = combineRedirects(finalRedir, $3);
+        {
+            redirect_t finalRedir = $1;
+            finalRedir = combineRedirects(finalRedir, $3);
 
-        command_t cmd = createCommand($2, NULL); // NULL args
+            command_t cmd = createCommand($2, NULL); // NULL args
 
-        $$ = createCommandWithRedirects(cmd, finalRedir);
-    }
+            $$ = createCommandWithRedirects(cmd, finalRedir);
+        }
     | redirect_list name redirect_list args redirect_list
-    {
-        // combine redirs - last one is most important
-        redirect_t finalRedir = $1;
-        finalRedir = combineRedirects(finalRedir, $3);
-        finalRedir = combineRedirects(finalRedir, $5);
+        {
+            // combine redirs - last one is most important
+            redirect_t finalRedir = $1;
+            finalRedir = combineRedirects(finalRedir, $3);
+            finalRedir = combineRedirects(finalRedir, $5);
 
-        command_t cmd = createCommand($2, $4);
+            command_t cmd = createCommand($2, $4);
 
-        $$ = createCommandWithRedirects(cmd, finalRedir);
-    }
+            $$ = createCommandWithRedirects(cmd, finalRedir);
+        }
     ;
 
 name:

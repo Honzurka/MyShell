@@ -86,15 +86,22 @@ void handleCommand(char* path, char* args) {
     char* name = basename(pathCopy);
     char** argArr = createArgArray(name, args);
 
+    char* programPath = NULL;
     if (strcmp(path, name) == 0) {
-        free(path);
-        path = findProgramInPATH(name);
-    }
-    if (path == NULL) {
-        if (tryExecutionWithoutPath(name, argArr) == 0) {
-            setErrorWithAlloc(UNKNOWN_COMMAND_ERROR, "command not found...", 0);
+        programPath = findProgramInPATH(name);
+
+        if (programPath == NULL) {
+            if (tryExecutionWithoutPath(name, argArr) == 0) {
+                setErrorWithAlloc(UNKNOWN_COMMAND_ERROR, "command not found...",
+                                  0);
+            }
+            goto cleanup;
         }
-        goto cleanup;
+    } else {
+        programPath = strdup(path);
+        if (programPath == NULL) {
+            err(1, "strdup failed\n");
+        }
     }
 
     pid_t pid = fork();
@@ -103,7 +110,7 @@ void handleCommand(char* path, char* args) {
         err(1, "fork failed\n");
         break;
     case 0:   // child
-        if (execv(path, argArr) == -1) {
+        if (execv(programPath, argArr) == -1) {
             _exit(UNKNOWN_COMMAND_ERROR);
         }
     default:   // parent
@@ -112,9 +119,8 @@ void handleCommand(char* path, char* args) {
     }
 
 cleanup:
-    free(path);
+    free(programPath);
     free(pathCopy);
-    free(args);
     free(argArr);
 }
 
@@ -129,8 +135,6 @@ void runCommand(command_t command) {
     if (customCommandID != -1) {
         char** argArr = createArgArray(path, args);
         handleCustomCommand(customCommandID, argArr);
-        free(path);
-        free(args);
     } else {
         resetError();
         handleCommand(path, args);
@@ -188,11 +192,9 @@ void runCommandWithRedirects(command_node_t* node) {
 
     if (redirect.inFile != NULL) {
         replaceFileByFD(STDIN_FILENO, stdinCopy);
-        free(redirect.inFile);
     }
     if (redirect.outFile != NULL) {
         replaceFileByFD(STDOUT_FILENO, stdoutCopy);
-        free(redirect.outFile);
     }
 }
 
@@ -213,14 +215,15 @@ void addCommandNode(command_head_t* head, command_node_t* node) {
 }
 
 void freeCommandQueue(command_head_t* head) {
-    // printf("free command queue called\n");
     command_node_t* iter = STAILQ_FIRST(head);
     while (iter != NULL) {
+        freeCommandWithRedirects(iter->data);
         command_node_t* next = STAILQ_NEXT(iter, entries);
         free(iter);
         iter = next;
     }
     free(head);
+    head = NULL;
 }
 
 int getCmdQueueSize(command_head_t* head) {
@@ -261,5 +264,4 @@ void runCommandsInQueue(command_head_t* head, int readFD, int writeFD) {
         }
         idx++;
     }
-    freeCommandQueue(head);
 }

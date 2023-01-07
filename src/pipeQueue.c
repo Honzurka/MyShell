@@ -34,11 +34,13 @@ int getQueueSize(pipe_head_t* head) {
 void freePipeQueue(pipe_head_t* head) {
     pipe_node_t* iter = STAILQ_FIRST(head);
     while (iter != NULL) {
+        freeCommandQueue(iter->data);
         pipe_node_t* next = STAILQ_NEXT(iter, entries);
         free(iter);
         iter = next;
     }
     free(head);
+    head = NULL;
 }
 
 void runCommandsByChild(command_head_t* command_head, int readFD, int writeFD) {
@@ -83,8 +85,6 @@ void runPipesInQueue(pipe_head_t* head) {
         oldPipeFD[0] = pipeFD[0];
         oldPipeFD[1] = pipeFD[1];
         childIdx++;
-
-        freeCommandQueue(iter->data);
     }
 
     safeCloseUnlessStandard(oldPipeFD[1], "closing pipe failed");

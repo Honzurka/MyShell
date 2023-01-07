@@ -80,3 +80,22 @@ command_with_redirects_t createCommandWithRedirects(command_t command,
 
     return result;
 }
+
+void freeCommand(command_t command) {
+    free(command.args);
+    command.args = NULL;
+    free(command.name);
+    command.name = NULL;
+}
+
+void freeRedirect(redirect_t redirect) {
+    free(redirect.inFile);
+    redirect.inFile = NULL;
+    free(redirect.outFile);
+    redirect.outFile = NULL;
+}
+
+void freeCommandWithRedirects(command_with_redirects_t cwr) {
+    freeCommand(cwr.command);
+    freeRedirect(cwr.redirect);
+}
