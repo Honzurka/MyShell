@@ -21,7 +21,9 @@ char* concatArgs(char* str1, char* str2) {
     sprintf(result, "%s %s", str1, str2);
 
     free(str1);
+    str1 = NULL;
     free(str2);
+    str2 = NULL;
 
     return result;
 }

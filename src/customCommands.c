@@ -31,6 +31,7 @@ int getCustomCommandID(char* command) {
 void handleCustomCommand(int commandID, char** args) {
     customHandlers[commandID](args);
     free(args);
+    args = NULL;
 }
 
 void handleExit(char** args) {
